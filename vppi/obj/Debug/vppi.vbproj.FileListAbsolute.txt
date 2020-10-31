@@ -1,0 +1,10 @@
+C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi.exe.config
+C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi.exe
+C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi.pdb
+C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi.xml
+C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.vbprojAssemblyReference.cache
+C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.Resources.resources
+C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.vbproj.GenerateResource.cache
+C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.exe
+C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.xml
+C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.pdb
