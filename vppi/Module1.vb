@@ -5,8 +5,7 @@ Module Module1
     Dim interpreters As New List(Of VppInterpreter)
 
     Sub Main()
-        newinterpreter("C:\Users\MATEI\Documents\vpptest\index.vpp")
-        'mainfunc(My.Application.CommandLineArgs.ToList(), My.Application.CommandLineArgs.Count)
+        mainfunc(My.Application.CommandLineArgs.ToList(), My.Application.CommandLineArgs.Count)
     End Sub
 
     Sub mainfunc(args As List(Of String), argc As Integer)
