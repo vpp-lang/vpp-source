@@ -20,4 +20,25 @@ Module Module1
         interpreters.Add(New VppInterpreter(fpath))
     End Sub
 
+    Function getappdir()
+        Return Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData).ToString).ToString
+    End Function
+
+    Function getapplogsdir()
+        If Directory.Exists(getappdir() + "\logs") Then
+
+        Else
+            Directory.CreateDirectory(getappdir() + "\logs")
+        End If
+        Return getappdir() + "\logs"
+    End Function
+
+    Function getapplibsdir()
+        If Directory.Exists(getappdir() + "\libs") Then
+
+        Else
+            Directory.CreateDirectory(getappdir() + "\libs")
+        End If
+        Return getappdir() + "\libs"
+    End Function
 End Module
