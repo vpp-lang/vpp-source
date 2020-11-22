@@ -29,8 +29,10 @@ Public Class VppInterpreter
     Private tmpip1 = 0 'temp pointer 2
     Private tmpip2 = -1 'temp pointer 3
     Private tmpval = Nothing 'temp value
+    Private tmpval1 = Nothing 'temp value 1 (if)
+    Private tmpval2 = Nothing 'temp value 2 (if)
     Private canexec = True 'can execute
-    Private inif = True 'in "if" statement
+    Private state = 0 'in "if" statement
     Private starttimer As Integer 'timer value
     Public objects As New Dictionary(Of String, DefineObject) 'defined objects by script (int, string, function)
     Public events As New Dictionary(Of String, String)
@@ -60,7 +62,7 @@ Public Class VppInterpreter
             logfile = File.CreateText(Module1.getapplogsdir() + logfilename)
             logfile.AutoFlush = True
             starttimer = 100
-            ticktimer = New Threading.Timer(AddressOf tick, Nothing, 0, Timeout.Infinite)
+            ticktimer = New Threading.Timer(AddressOf tick, Nothing, 0, starttimer)
             log("[" + DateTime.Now.ToString + "]: Setting up...")
             While True
 
@@ -68,10 +70,10 @@ Public Class VppInterpreter
         End If
     End Sub
 
-    Function tick(stateInfo As Object) As TimerCallback
+    Function tick(state As Object) As TimerCallback
         ptick()
 
-        'ticktimer.Dispose()
+        ticktimer.Dispose()
         ticktimer = New Threading.Timer(AddressOf tick, Nothing, 0, starttimer)
     End Function
 
@@ -92,50 +94,48 @@ Public Class VppInterpreter
         tmpip = -1
         tmpip1 = -1
         canexec = True
-        inif = False
+        state = 0
     End Sub
 
     Sub setup()
         If tmpip < ac.Count Then
-            Static teststring As String
-            Static insset() As String
+            Static steststring As String
+            Static sinsset() As String
 
             Try
-                teststring = ac.Item(tmpip)
+                steststring = ac.Item(tmpip)
             Catch ex As ArgumentOutOfRangeException
 
             End Try
 
-            insset = Split(teststring)
+            sinsset = Split(steststring)
 
-            insset(0) = ""
-            For Each ii In Split(teststring)(0)
+            sinsset(0) = ""
+            For Each ii In Split(steststring)(0)
 
                 If Asc(ii) = 9 Then
 
                 ElseIf Asc(ii) = 10 Then
 
                 Else
-                    insset(0) = insset(0) + ii
+                    sinsset(0) = sinsset(0) + ii
                 End If
             Next
 
-            If insset(0) = "@ScriptName" Then
-                threadname = insset(1)
-            ElseIf insset(0) = "@EntryPoint" Then
-                nf = insset(1)
-            ElseIf insset(0) = "@Include" Then
-                dependencies.Add(insset(1), New VppInterpreter(insset(1), True))
-                log("[" + DateTime.Now.ToString + "]: Loaded dependency. File path: " + insset(1))
-            ElseIf insset(0) = "@IgnoreErrors" Then
+            If sinsset(0) = "@ScriptName" Then
+                threadname = sinsset(1)
+            ElseIf sinsset(0) = "@EntryPoint" Then
+                nf = sinsset(1)
+            ElseIf sinsset(0) = "@Include" Then
+                dependencies.Add(sinsset(1), New VppInterpreter(sinsset(1), True))
+                log("[" + DateTime.Now.ToString + "]: Loaded dependency. File path: " + sinsset(1))
+            ElseIf sinsset(0) = "@IgnoreErrors" Then
                 ignoreerr = True
-            ElseIf insset(0) = "@SkipSetup" Then
-                tmpip = ac.Count - 1
-            ElseIf insset(0) = "function" Then
-                objects.Add(insset(1), New DefineObject("function", tmpip))
-                log("[" + DateTime.Now.ToString + "]: Defined function " + insset(1) + ", ip: " + tmpip.ToString)
-            ElseIf insset(0) = "@HandleEvent" Then
-                If insset(1) = "InputEvent" Then
+            ElseIf sinsset(0) = "function" Then
+                objects.Add(sinsset(1), New DefineObject("function", tmpip))
+                log("[" + DateTime.Now.ToString + "]: Defined function " + sinsset(1) + ", ip: " + tmpip.ToString)
+            ElseIf sinsset(0) = "@HandleEvent" Then
+                If sinsset(1) = "InputEvent" Then
                     tmpval = "InputEvent"
                 End If
             Else
@@ -155,15 +155,14 @@ Public Class VppInterpreter
             Static teststring As String
             Static insset() As String
 
-            Try
-                teststring = ac.Item(ip)
-            Catch ex As ArgumentOutOfRangeException
-
-            End Try
-
-            insset = Split(teststring)
-
             If canexec Then
+                Try
+                    teststring = ac.Item(ip)
+                Catch ex As ArgumentOutOfRangeException
+                    teststring = ""
+                End Try
+
+                insset = Split(teststring)
                 execfunction(insset, teststring.Length)
 
                 ip = ip + 1
@@ -211,54 +210,61 @@ Public Class VppInterpreter
 
             ElseIf insset(0) = "command" Then
                 instruction_interrupt(insset)
-            ElseIf insset(0) = "wait" Then
-                instruction_wait(insset)
+
             ElseIf insset(0) = "exit" Then
-                End
+                If state = 1 Then
+
+                Else
+                    End
+                End If
             ElseIf insset(0) = "define" Then
                 instruction_def(insset)
             ElseIf insset(0) = "function" Then
 
             ElseIf insset(0) = "if" Then
-
+                instruction_if(insset)
             ElseIf insset(0) = "end" Then
-
-            ElseIf insset(0) = "return" Then
-                If ip = -1 Then
-
-                Else
-                    ip = tmpip2
+                If insset(1) = "if" Then
+                    If state = 1 Then
+                        state = 0
+                    ElseIf state = 2 Then
+                        state = 0
+                    End If
                 End If
             ElseIf insset(0) = "#" Then
                 'Comment
             ElseIf insset(0).StartsWith("#") Then
                 'Comment
             Else
-                If insset(0).Length > 1 Then
-                    If objects.ContainsKey(insset(0)) Then
-                        If insset(1) = "=" Then
-                            'Set variable value
-                            If objects(insset(0)).type = "string" Then
-                                setvalue(insset(0), stringa_to_string(insset, 2))
-                            End If
-                        Else
+                If state = 1 Then
+
+                Else
+                    If insset(0).Length > 1 Then
+                        If objects.ContainsKey(insset(0)) Then
+                            If insset(1) = "=" Then
+                                'Set variable value
+                                If objects(insset(0)).type = "string" Then
+                                    setvalue(insset(0), stringa_to_string(insset, 2))
+                                End If
+                            Else
                                 'Execute function
                                 tmpip2 = ip - 1
-                            ip = objects(insset(0)).value - 1
-                            nf = insset(0)
-                        End If
-                    Else
-                        canexec = False
-                        Dim insset_string = ""
-                        For Each i In insset
-                            insset_string = insset_string + i + " "
-                        Next
-                        exceptionmsg("Syntax error: " + insset_string, "g_0001")
-                        If ignoreerr = True Then
-                            canexec = True
+                                ip = objects(insset(0)).value - 1
+                                nf = insset(0)
+                            End If
                         Else
-                            Console.Read()
-                            End
+                            canexec = False
+                            Dim insset_string = ""
+                            For Each i In insset
+                                insset_string = insset_string + i + " "
+                            Next
+                            exceptionmsg("Syntax error: " + insset_string, "g_0001")
+                            If ignoreerr = True Then
+                                canexec = True
+                            Else
+                                Console.Read()
+                                End
+                            End If
                         End If
                     End If
                 End If
@@ -291,7 +297,55 @@ Public Class VppInterpreter
         End If
     End Sub
 
+    Sub instruction_if(ByVal stringvalif() As String)
+        If state = 1 Then
+            Exit Sub
+        End If
+        Static ifparameters As String()
+        ifparameters = parsearguments(stringvalif, 1)
+        If gettypefromval(ifparameters(1)) = "string" Then
+            tmpval1 = ifparameters(1)
+        ElseIf gettypefromval(ifparameters(1)) = "int" Then
+            tmpval1 = ifparameters(1)
+        ElseIf gettypefromval(ifparameters(1)) = "bool" Then
+            tmpval1 = ifparameters(1)
+        ElseIf gettypefromval(ifparameters(1)) = "null" Then
+            tmpval1 = ifparameters(1)
+        Else
+            If objects.ContainsKey(ifparameters(1)) Then
+                tmpval1 = objects(vppstring_to_string(ifparameters(1))).value
+            End If
+        End If
+
+        If gettypefromval(ifparameters(2)) = "string" Then
+            tmpval2 = ifparameters(2)
+        ElseIf gettypefromval(ifparameters(2)) = "int" Then
+            tmpval2 = ifparameters(2)
+        ElseIf gettypefromval(ifparameters(2)) = "bool" Then
+            tmpval2 = ifparameters(2)
+        ElseIf gettypefromval(ifparameters(2)) = "null" Then
+            tmpval2 = ifparameters(2)
+        Else
+            If objects.ContainsKey(ifparameters(2)) Then
+                tmpval2 = objects(vppstring_to_string(ifparameters(2))).value
+            End If
+        End If
+
+        If ifparameters(0) = "0" Then
+            If tmpval1 = tmpval2 Then
+                state = 2
+            Else
+                state = 1
+            End If
+        End If
+        tmpval1 = Nothing
+        tmpval2 = Nothing
+    End Sub
+
     Sub instruction_def(ByVal stringval() As String)
+        If state = 1 Then
+            Exit Sub
+        End If
         tmpval = Nothing
         If stringval(2) = "as" Then
             If gettypefromval(stringval(1)) = "int" Then
@@ -319,13 +373,46 @@ Public Class VppInterpreter
                         End Try
                     End If
                 ElseIf stringval(3) = "bool" Then
-
+                    If stringval(4) = "=" Then
+                        Try
+                            log("[" + DateTime.Now.ToString + "]: Value defined (string). vname: " + Chr(34) + stringval(1) + Chr(34) + ",vval: " + Chr(34) + tmpval + Chr(34))
+                            objects.Add(stringval(1), New DefineObject("bool", stringval(5)))
+                        Catch ex As Exception
+                            canexec = False
+                            exceptionmsg("Failed to define variable.", "d_0001")
+                            If ignoreerr = True Then
+                                canexec = True
+                            Else
+                                Console.Read()
+                                End
+                            End If
+                        End Try
+                    End If
+                ElseIf stringval(3) = "int" Then
+                    If stringval(4) = "=" Then
+                        Try
+                            log("[" + DateTime.Now.ToString + "]: Value defined (string). vname: " + Chr(34) + stringval(1) + Chr(34) + ",vval: " + Chr(34) + tmpval + Chr(34))
+                            objects.Add(stringval(1), New DefineObject("int", stringval(5)))
+                        Catch ex As Exception
+                            canexec = False
+                            exceptionmsg("Failed to define variable.", "d_0001")
+                            If ignoreerr = True Then
+                                canexec = True
+                            Else
+                                Console.Read()
+                                End
+                            End If
+                        End Try
+                    End If
                 End If
             End If
         End If
     End Sub
 
     Sub instruction_interrupt(ByVal stringval() As String)
+        If state = 1 Then
+            Exit Sub
+        End If
         Try
             Static parameters As String()
             parameters = parsearguments(stringval, 1)
@@ -392,14 +479,6 @@ Public Class VppInterpreter
                         ip = Convert.ToDecimal(objects(parameters(1)).value)
                     End If
                 End If
-            ElseIf parameters(0) = "0x000E" Then
-                If gettypefromval(parameters(1)) = "string" Then
-                    log("[" + DateTime.Now.ToString + "]: " + vppstring_to_string(parameters(1)))
-                Else
-                    If objects.ContainsKey(parameters(1)) Then
-                        log("[" + DateTime.Now.ToString + "]: " + vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
-                    End If
-                End If
             ElseIf parameters(0) = "0x000F" Then
                 If gettypefromval(parameters(1)) = "string" Then
                     canexec = False
@@ -422,6 +501,32 @@ Public Class VppInterpreter
                         End If
                     End If
                 End If
+            ElseIf parameters(0) = "0x0010" Then
+                If objects.ContainsKey(parameters(1)) Then
+                    canexec = False
+                    objects(parameters(1)).value = InputBox(vppstring_to_string(parameters(2)))
+                    canexec = True
+                Else
+
+                End If
+            ElseIf parameters(0) = "0x0011" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        If File.Exists(vppstring_to_string(parameters(2))) Then
+                            objects(parameters(1)).value = File.ReadAllText(vppstring_to_string(parameters(2)))
+                        End If
+                    Else
+
+                    End If
+                Catch ex As Exception
+                    exceptionmsg("Failed to access file.", "p_0001")
+                    If ignoreerr = True Then
+                        canexec = True
+                    Else
+                        Console.Read()
+                        End
+                    End If
+                End Try
             Else
                 canexec = False
                 exceptionmsg("Invalid arguments given: " + Chr(34) + parameters(0) + Chr(34), "c_0001")
@@ -552,6 +657,10 @@ Public Class VppInterpreter
             Return "int"
         ElseIf value.value.Remove(1) = "9" Then
             Return "int"
+        ElseIf value.value = "null" Then
+            Return "null"
+        ElseIf value.value = "null" Then
+            Return "null"
         Else
             Return Nothing
         End If
@@ -584,25 +693,46 @@ Public Class VppInterpreter
             Return "int"
         ElseIf value.Remove(1) = "9" Then
             Return "int"
+        ElseIf value = "null" Then
+            Return "null"
+        ElseIf value = "null" Then
+            Return "null"
         Else
             Return Nothing
         End If
     End Function
 
     Function vppstring_to_string(_value As String) As String
-        Static tmpval
+        Static vpps_tmpval
+        vpps_tmpval = ""
         tmpval = ""
         For Each i In _value
             If i = Chr(34) Then
 
+            ElseIf i = "\" Then
+                If tmpval = "" Then
+                    tmpval = "\"
+                ElseIf tmpval = "\" Then
+                    tmpval = "\\"
+                End If
             Else
-                tmpval = tmpval + i
+                If i = "n" Then
+                    If tmpval = "\\" Then
+                        vpps_tmpval = vpps_tmpval + vbNewLine
+                        tmpval = ""
+                    Else
+                        vpps_tmpval = vpps_tmpval + i
+                    End If
+                Else
+                    vpps_tmpval = vpps_tmpval + i
+                End If
             End If
         Next
-        Return tmpval
+        tmpval = Nothing
+        Return vpps_tmpval
     End Function
 
-    Function vppstring_to_bool(_value As String) As Boolean
+    Function string_to_bool(_value As String) As Boolean
         If _value = "true" Then
             Return True
         ElseIf _value = "false" Then
@@ -610,7 +740,7 @@ Public Class VppInterpreter
         End If
     End Function
 
-    Function bool_to_vppstring(_value As Boolean) As String
+    Function bool_to_string(_value As Boolean) As String
         If _value = True Then
             Return "true"
         ElseIf _value = False Then
@@ -629,6 +759,10 @@ Public Class VppInterpreter
             tmpip += 1
         Next
         Return tmpval_stra
+    End Function
+
+    Function conditionval()
+
     End Function
 
     Sub log(logmsg As String)

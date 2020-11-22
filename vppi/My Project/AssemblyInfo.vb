@@ -9,7 +9,7 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("vppi")>
-<Assembly: AssemblyDescription("V++ Interpreter.")>
+<Assembly: AssemblyDescription("V++ Interpreter")>
 <Assembly: AssemblyCompany("VMGP Official")>
 <Assembly: AssemblyProduct("vppi")>
 <Assembly: AssemblyCopyright("")>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")>
 
-<Assembly: AssemblyVersion("1.0.0.0")>
-<Assembly: AssemblyFileVersion("1.0.0.0")>
+<Assembly: AssemblyVersion("1.0.0.1")>
+<Assembly: AssemblyFileVersion("1.0.0.1")>

@@ -12,6 +12,26 @@ Module Module1
         If argc = 1 Then
             If File.Exists(args(0)) Then
                 newinterpreter(args(0))
+            ElseIf args(0) = "-v" Then
+                Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString)
+                Console.WriteLine("Made by VMGP (2016-2020)")
+            ElseIf args(0) = "--version" Then
+                Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString)
+                Console.WriteLine("Made by VMGP (2016-2020)")
+            ElseIf args(0) = "-?" Then
+                Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString)
+                Console.WriteLine()
+                Console.WriteLine("Uses:")
+                Console.WriteLine("vppi -?  vppi --help : Help.")
+                Console.WriteLine("vppi -v  vppi --version : Show vppi version.")
+                Console.WriteLine("vppi [FILE] : Start intepreting a script.")
+            ElseIf args(0) = "--help" Then
+                Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString)
+                Console.WriteLine()
+                Console.WriteLine("Uses:")
+                Console.WriteLine("vppi -?  vppi --help : Help.")
+                Console.WriteLine("vppi -v  vppi --version : Show vppi version.")
+                Console.WriteLine("vppi [FILE] : Start intepreting a script.")
             End If
         End If
     End Sub
@@ -21,7 +41,7 @@ Module Module1
     End Sub
 
     Function getappdir()
-        Return Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData).ToString).ToString
+        Return Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData).ToString
     End Function
 
     Function getapplogsdir()
