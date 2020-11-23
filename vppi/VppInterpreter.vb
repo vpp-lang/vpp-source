@@ -337,6 +337,18 @@ Public Class VppInterpreter
             Else
                 state = 1
             End If
+        ElseIf ifparameters(0) = "1" Then
+            If tmpval1 > tmpval2 Then
+                state = 2
+            Else
+                state = 1
+            End If
+        ElseIf ifparameters(0) = "2" Then
+            If tmpval1 < tmpval2 Then
+                state = 2
+            Else
+                state = 1
+            End If
         End If
         tmpval1 = Nothing
         tmpval2 = Nothing
