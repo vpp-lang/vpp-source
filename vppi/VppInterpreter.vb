@@ -259,12 +259,6 @@ Public Class VppInterpreter
                                 insset_string = insset_string + i + " "
                             Next
                             exceptionmsg("Syntax error: " + insset_string, "g_0001")
-                            If ignoreerr = True Then
-                                canexec = True
-                            Else
-                                Console.Read()
-                                End
-                            End If
                         End If
                     End If
                 End If
@@ -287,6 +281,12 @@ Public Class VppInterpreter
         Console.WriteLine()
         Console.WriteLine("Exception: [" + errcode + "] at " + threadname + " (" + (ip + 1).ToString + "): " + message)
         Console.WriteLine("Press any key...")
+        If ignoreerr = True Then
+            canexec = True
+        Else
+            Console.Read()
+            End
+        End If
     End Sub
 
     Sub instruction_wait(ByVal stringval() As String)
@@ -349,6 +349,12 @@ Public Class VppInterpreter
             Else
                 state = 1
             End If
+        ElseIf ifparameters(0) = "3" Then
+            If Not tmpval1 = tmpval2 Then
+                state = 2
+            Else
+                state = 1
+            End If
         End If
         tmpval1 = Nothing
         tmpval2 = Nothing
@@ -376,12 +382,6 @@ Public Class VppInterpreter
                         Catch ex As Exception
                             canexec = False
                             exceptionmsg("Failed to define variable.", "d_0001")
-                            If ignoreerr = True Then
-                                canexec = True
-                            Else
-                                Console.Read()
-                                End
-                            End If
                         End Try
                     End If
                 ElseIf stringval(3) = "bool" Then
@@ -392,12 +392,6 @@ Public Class VppInterpreter
                         Catch ex As Exception
                             canexec = False
                             exceptionmsg("Failed to define variable.", "d_0001")
-                            If ignoreerr = True Then
-                                canexec = True
-                            Else
-                                Console.Read()
-                                End
-                            End If
                         End Try
                     End If
                 ElseIf stringval(3) = "int" Then
@@ -408,12 +402,6 @@ Public Class VppInterpreter
                         Catch ex As Exception
                             canexec = False
                             exceptionmsg("Failed to define variable.", "d_0001")
-                            If ignoreerr = True Then
-                                canexec = True
-                            Else
-                                Console.Read()
-                                End
-                            End If
                         End Try
                     End If
                 End If
@@ -457,7 +445,15 @@ Public Class VppInterpreter
                 canexec = True
             ElseIf parameters(0) = "0x0007" Then
                 canexec = False
-                Console.ReadLine()
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        objects(parameters(1)).value = Chr(34) + Console.ReadLine() + Chr(34)
+                    Else
+
+                    End If
+                Catch ex As Exception
+                    exceptionmsg("Failed to access file.", "p_0001")
+                End Try
                 canexec = True
             ElseIf parameters(0) = "0x0008" Then
                 canexec = False
@@ -495,28 +491,16 @@ Public Class VppInterpreter
                 If gettypefromval(parameters(1)) = "string" Then
                     canexec = False
                     exceptionmsg(parameters(1), "g_0004")
-                    If ignoreerr = True Then
-                        canexec = True
-                    Else
-                        Console.Read()
-                        End
-                    End If
                 Else
                     If objects.ContainsKey(parameters(1)) Then
                         canexec = False
                         exceptionmsg(parameters(1), vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
-                        If ignoreerr = True Then
-                            canexec = True
-                        Else
-                            Console.Read()
-                            End
-                        End If
                     End If
                 End If
             ElseIf parameters(0) = "0x0010" Then
                 If objects.ContainsKey(parameters(1)) Then
                     canexec = False
-                    objects(parameters(1)).value = InputBox(vppstring_to_string(parameters(2)))
+                    objects(parameters(1)).value = Chr(34) + InputBox(vppstring_to_string(parameters(2))) + Chr(34)
                     canexec = True
                 Else
 
@@ -525,40 +509,42 @@ Public Class VppInterpreter
                 Try
                     If objects.ContainsKey(parameters(1)) Then
                         If File.Exists(vppstring_to_string(parameters(2))) Then
-                            objects(parameters(1)).value = File.ReadAllText(vppstring_to_string(parameters(2)))
+                            objects(parameters(1)).value = Chr(34) + File.ReadAllText(vppstring_to_string(parameters(2))) + Chr(34)
                         End If
                     Else
 
                     End If
                 Catch ex As Exception
-                    exceptionmsg("Failed to access file.", "p_0001")
-                    If ignoreerr = True Then
-                        canexec = True
+                    exceptionmsg("Failed to access file.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x0012" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        My.Computer.FileSystem.WriteAllText(vppstring_to_string(parameters(2)), vppstring_to_string(objects(vppstring_to_string(parameters(1))).value), False)
                     Else
-                        Console.Read()
-                        End
+                        My.Computer.FileSystem.WriteAllText(vppstring_to_string(parameters(2)), vppstring_to_string(parameters(1)), False)
                     End If
+                Catch ex As Exception
+                    exceptionmsg("Failed to access file.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x0013" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        Shell(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                    Else
+                        Shell(vppstring_to_string(parameters(1)))
+                    End If
+                Catch ex As Exception
+                    exceptionmsg("General exception.", "g_0003")
                 End Try
             Else
                 canexec = False
                 exceptionmsg("Invalid arguments given: " + Chr(34) + parameters(0) + Chr(34), "c_0001")
-                If ignoreerr = True Then
-                    canexec = True
-                Else
-                    Console.Read()
-                    End
-                End If
             End If
         Catch ex As Exception
             If TypeOf ex Is NullReferenceException Then
                 canexec = False
                 exceptionmsg("Internal exception: " + ex.Message, "c_0002")
-                If ignoreerr = True Then
-                    canexec = True
-                Else
-                    Console.Read()
-                    End
-                End If
             End If
         End Try
     End Sub
@@ -720,7 +706,12 @@ Public Class VppInterpreter
         tmpval = ""
         For Each i In _value
             If i = Chr(34) Then
+                If tmpval = "\\" Then
+                    vpps_tmpval = vpps_tmpval + Chr(34)
+                    tmpval = ""
+                Else
 
+                End If
             ElseIf i = "\" Then
                 If tmpval = "" Then
                     tmpval = "\"
