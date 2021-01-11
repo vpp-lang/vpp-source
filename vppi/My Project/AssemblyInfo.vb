@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("V++ Interpreter")>
 <Assembly: AssemblyCompany("VMGP Official")>
 <Assembly: AssemblyProduct("vppi")>
-<Assembly: AssemblyCopyright("")>
+<Assembly: AssemblyCopyright("VMGP Official")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")>
 
-<Assembly: AssemblyVersion("1.0.0.3")>
-<Assembly: AssemblyFileVersion("1.0.0.3")>
+<Assembly: AssemblyVersion("1.1.0.0")>
+<Assembly: AssemblyFileVersion("1.1.0.0")>

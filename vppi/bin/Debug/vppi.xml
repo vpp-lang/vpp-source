@@ -22,5 +22,54 @@ vppi
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
+<member name="T:vppi.VppInterpreter">
+ <summary>
+ The V++ interpreter class. Check https://github.com/VMGP/vppi/wiki.
+ </summary>
+</member>
+<member name="M:vppi.VppInterpreter.startinterpret">
+ <summary>
+ Start interpreting the script.
+ </summary>
+</member>
+<member name="M:vppi.VppInterpreter.reset">
+ <summary>
+ Reset the interpreter tempvals.
+ </summary>
+</member>
+<member name="M:vppi.VppInterpreter.setup">
+ <summary>
+ Setting up the script. (defining functions, loading dependencies)
+ </summary>
+</member>
+<member name="M:vppi.VppInterpreter.include(System.String)">
+ <summary>
+ Load a dependency. Function called with the "@Include" keyword, at setup time.
+ </summary>
+ <param name="fpath">File path to the dependency.</param>
+</member>
+<member name="M:vppi.VppInterpreter.exceptionmsg(System.String,System.String,System.Int32)">
+ <summary>
+ Exception message. Check https://github.com/VMGP/vppi/wiki
+ </summary>
+ <param name="message">Exception message.</param>
+ <param name="errcode">Error code.</param>
+ <param name="severity"></param>
+</member>
+<member name="M:vppi.VppInterpreter.webreq(System.String)">
+ <summary>
+ Simple web request.
+ </summary>
+ <param name="requrl">URL Path</param>
+ <returns>Response.</returns>
+</member>
+<member name="M:vppi.VppInterpreter.webreq(System.String,System.String)">
+ <summary>
+ Web request with POST.
+ </summary>
+ <param name="requrl">URL Path</param>
+ <param name="uploadstr">String for post request.</param>
+ <returns>Response.</returns>
+</member>
 </members>
 </doc>
