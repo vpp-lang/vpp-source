@@ -33,4 +33,4 @@ Nothing interesting happened, just decided to remake V++ from scratch, which res
 ## 2019
 Made a lot of progress, the syntax of V++ in 2019 is very similar to the one in ```1.0.0.0```. 
 ## 2020
-Released V++ ```1.0.0.0``` on 22 Nov 2020.
+Released V++ ```1.0.0.0``` on 19 Nov 2020.
