@@ -25,7 +25,7 @@ When you load a script a new interpreter instance that runs in parallel with the
 
 After the loading of the script the interpreter (either master or slave) will enter the setup phase, where setup keywords like ```@EntryPoint```, ```@Include``` and ```function```. The setup phase defines functions and sets things up before the runtime phase. After the setup finishes, the interpreter enters in the runtime phase, where the script is executed.
 
-# History
+# History and important events
 ## 2017
 The first V++ interpreter was made in 2017, but it was very unstable and didn't have an official name. The syntax was strange. (```printline Hello world!```).
 ## 2018
@@ -34,3 +34,5 @@ Nothing interesting happened, just decided to remake V++ from scratch, which res
 Made a lot of progress, the syntax of V++ in 2019 is very similar to the one in ```1.0.0.0```. 
 ## 2020
 Released V++ ```1.0.0.0``` on 19 Nov 2020.
+## 2021
+First prerelease of V++.
