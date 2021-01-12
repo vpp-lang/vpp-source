@@ -1,3 +1,8 @@
+<div align="center">
+<p>
+    <img width="80" src="https://raw.githubusercontent.com/VMGP/vppi/blob/main/vppicon.png">
+</p>
+
 # vppi (V++ Interpreter)
 <a><img src="https://img.shields.io/maintenance/yes/2021"></a>
 <a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/VMGP/vppi?label=stable%20release"></a>
