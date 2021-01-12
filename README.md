@@ -1,6 +1,6 @@
 <div align="center">
 <p>
-    <img width="80" src="https://raw.githubusercontent.com/VMGP/vppi/blob/main/vppicon.png">
+    <img width="80" src="https://raw.githubusercontent.com/VMGP/vppi/main/vppicon.png">
 </p>
 
 # vppi (V++ Interpreter)
