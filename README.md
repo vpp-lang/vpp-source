@@ -3,7 +3,7 @@
 <a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/VMGP/vppi?label=stable%20release"></a>
 <a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/VMGP/vppi?include_prereleases"></a>
 <a href="https://en.wikipedia.org/wiki/Visual_Basic_.NET"><img src="https://img.shields.io/badge/language-Visual%20Basic%20.NET-blue"></a>
-
+<a><img src="https://img.shields.io/badge/Platform-Windows-blue"></a>
 
 
 ## Introduction
