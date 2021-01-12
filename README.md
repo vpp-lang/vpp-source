@@ -10,6 +10,7 @@
 <a href="https://en.wikipedia.org/wiki/Visual_Basic_.NET"><img src="https://img.shields.io/badge/language-Visual%20Basic%20.NET-blue"></a>
 <a href=""><img src="https://img.shields.io/badge/Platform-Windows-blue"></a>
 
+</div>
 
 ## Introduction
 This is the V++ interpreter from the V++ programming language package. In order to install the V++ Runtime Environment you must [check releases](https://github.com/VMGP/vppi/releases). For documentation [check the V++ wiki](https://github.com/VMGP/vppi/wiki).
