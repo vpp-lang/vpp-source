@@ -13,6 +13,8 @@
 </div>
 
 ## Introduction
+V++ is a small static-typed interpreted language made for running small programs in a console window.
+
 This is the V++ interpreter from the V++ programming language package. In order to install the V++ Runtime Environment you must [check releases](https://github.com/VMGP/vppi/releases). For documentation [check the V++ wiki](https://github.com/VMGP/vppi/wiki).
 
 
