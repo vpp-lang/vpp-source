@@ -1,12 +1,12 @@
 <div align="center">
 <p>
-    <img width="80" src="https://raw.githubusercontent.com/VMGP/vppi/main/vppicon.png">
+    <img width="80" src="https://raw.githubusercontent.com/vpp-lang/vppi/main/vppicon.png">
 </p>
 
 # vppi (V++ Interpreter)
 <a><img src="https://img.shields.io/maintenance/yes/2021"></a>
-<a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/VMGP/vppi?label=stable%20release"></a>
-<a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/VMGP/vppi?include_prereleases"></a>
+<a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/vpp-lang/vppi?label=stable%20release"></a>
+<a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/vpp-lang/vppi?include_prereleases"></a>
 <a href="https://en.wikipedia.org/wiki/Visual_Basic_.NET"><img src="https://img.shields.io/badge/language-Visual%20Basic%20.NET-blue"></a>
 <a href=""><img src="https://img.shields.io/badge/Platform-Windows-blue"></a>
 
@@ -15,7 +15,7 @@
 ## Introduction
 V++ is a small static-typed interpreted language made for running small programs in a console window.
 
-This is the V++ interpreter from the V++ programming language package. In order to install the V++ Runtime Environment you must [check releases](https://github.com/VMGP/vppi/releases). For documentation [check the V++ wiki](https://github.com/VMGP/vppi/wiki).
+This is the V++ interpreter from the V++ programming language package. In order to install the V++ Runtime Environment you must [check releases](https://github.com/vpp-lang/vppi/releases). For documentation [check the V++ wiki](https://github.com/vpp-lang/vppi/wiki).
 
 
 In case you want to create V++ scripts and need syntax highlighting, you can [install the official V++ VSCode extension](https://marketplace.visualstudio.com/items?itemName=VMGPOfficial.vpp)
