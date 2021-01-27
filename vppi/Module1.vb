@@ -4,11 +4,12 @@ Imports System.Reflection
 Module Module1
 
     Dim interpreters As New List(Of VppInterpreter)
+    Dim prerelease = True
+    Dim versubfix = "-pre2"
 
     Sub Main()
         Console.Title = "[Prelease] " + System.Reflection.Assembly.GetExecutingAssembly.Location
         mainfunc(My.Application.CommandLineArgs.ToList(), My.Application.CommandLineArgs.Count)
-
     End Sub
 
     Sub mainfunc(args As List(Of String), argc As Integer)
@@ -17,10 +18,10 @@ Module Module1
                 newinterpreter(args(0))
             ElseIf args(0) = "-v" Then
                 Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString)
-                Console.WriteLine("Made by VMGP")
+                Console.WriteLine("Made by VMGP Official (2016-2021)")
             ElseIf args(0) = "--version" Then
                 Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString)
-                Console.WriteLine("Made by VMGP")
+                Console.WriteLine("Made by VMGP Official (2016-2021)")
             ElseIf args(0) = "-?" Then
                 Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString)
                 Console.WriteLine()

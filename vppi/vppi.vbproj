@@ -6,7 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{AD4569AD-2AF4-47C8-BE35-71BF362A2195}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>vppi.Module1</StartupObject>
+    <StartupObject>
+    </StartupObject>
     <RootNamespace>vppi</RootNamespace>
     <AssemblyName>vppi</AssemblyName>
     <FileAlignment>512</FileAlignment>
@@ -14,6 +15,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,7 +28,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -73,16 +74,19 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>newvpplogo.ico</ApplicationIcon>
+    <ApplicationIcon>vppicon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>BB1DD6B8705688204D25793A3F8834469D94E620</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>778A4559CFBCC0678436A8523D1060D1909C1BE0</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>vppi_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>vpp.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -149,8 +153,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="newvpplogo.ico" />
-    <Content Include="vpplogo.ico" />
+    <Content Include="vppicon.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">

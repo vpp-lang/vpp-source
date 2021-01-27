@@ -22,6 +22,7 @@ Public Class VppInterpreter
         Public _constant = False
         Public _temporary = False
         Public _private = False
+        Public _fargs As String()
 
         Sub New(Optional _type As String = Nothing, Optional _value As Object = Nothing)
             type = _type
@@ -55,6 +56,7 @@ Public Class VppInterpreter
     Public slave = False
     Public logfilename = ""
     Public logfile As StreamWriter
+    Dim invalidreserved As String() = {"#", "@", "!", "+", "-", "/", "*", "^", "vppmath", "command", "exit", "wait", "varop", "string", "int", "bool"}
 
     'Events
 
@@ -67,11 +69,20 @@ Public Class VppInterpreter
     Public webheaders As New Dictionary(Of String, String)
 
     Sub New(fpath As String, Optional _slave As Boolean = False)
-        code = File.ReadAllText(fpath)
-        logfilename = "\log_" + fpath.Substring(fpath.LastIndexOf("\") + 1) + "_" + DateTime.Now.Hour.ToString + DateTime.Now.Minute.ToString + DateTime.Now.Second.ToString + ".txt"
-        slave = _slave
-        threadname = fpath.Substring(fpath.LastIndexOf("\") + 1).Remove(fpath.Substring(fpath.LastIndexOf("\") + 1).LastIndexOf("."))
-        startinterpret()
+        Try
+            If Path.GetExtension(fpath) = ".vpp" Then
+
+            Else
+                MsgBox("Failed to load script.", MsgBoxStyle.Critical, "V++ Interpreter")
+            End If
+            code = File.ReadAllText(fpath)
+            logfilename = "\log_" + Path.GetFileNameWithoutExtension(fpath) + "_" + DateTime.Now.Hour.ToString + DateTime.Now.Minute.ToString + DateTime.Now.Second.ToString + ".txt"
+            slave = _slave
+            threadname = Path.GetFileNameWithoutExtension(fpath)
+            startinterpret()
+        Catch ex As Exception
+            MsgBox("Failed to load script.", MsgBoxStyle.Critical, "V++ Interpreter")
+        End Try
     End Sub
 
     ''' <summary>
@@ -94,6 +105,22 @@ Public Class VppInterpreter
         End If
     End Sub
 
+    Function varnamebad(varname)
+        Dim varnamebadt = False
+        canexec = False
+        For Each i In invalidreserved
+            If varname.Contains(i) Then
+                If i.Length < 1 Then
+                    varnamebadt = True
+                End If
+            End If
+            If varname = i Then
+                varnamebadt = True
+            End If
+        Next
+        canexec = True
+        Return varnamebadt
+    End Function
 
     Function tick(state As Object) As TimerCallback
         ptick()
@@ -101,7 +128,6 @@ Public Class VppInterpreter
         ticktimer.Dispose()
         ticktimer = New Threading.Timer(AddressOf tick, Nothing, 0, starttimer)
     End Function
-
 
     Public Sub ptick()
         If didsetup = False Then
@@ -165,8 +191,15 @@ Public Class VppInterpreter
             ElseIf sinsset(0) = "[private]" Then
 
             ElseIf sinsset(0) = "function" Then
-                objects.Add(sinsset(1), New DefineObject("function", tmpip))
-                log("[" + DateTime.Now.ToString + "-S]: Defined function " + sinsset(1) + ", ip: " + tmpip.ToString)
+                If varnamebad(sinsset(1)) Then
+                    exceptionmsg(Chr(34) + sinsset(1) + Chr(34) + " is an invalid or reserved name.", "", 0, True)
+                End If
+                If objects.ContainsKey(sinsset(1)) = False Then
+                    objects.Add(sinsset(1), New DefineObject("function", tmpip))
+                    objects(sinsset(1))._fargs = parsearguments(sinsset, 2)
+                    log("[" + DateTime.Now.ToString + "-S]: Defined function " + sinsset(1) + ", ip: " + tmpip.ToString)
+                End If
+
             ElseIf sinsset(0) = "@HandleEvent" Then
                 If sinsset(1) = "InputEvent" Then
                     tmpval = "InputEvent"
@@ -289,6 +322,8 @@ Public Class VppInterpreter
 
             ElseIf insset(0) = "if" Then
                 instruction_if(insset)
+            ElseIf insset(0) = "vppmath" Then
+                instruction_math(insset)
             ElseIf insset(0) = "end" Then
                 If insset(1) = "if" Then
                     If state = 1 Then
@@ -303,6 +338,7 @@ Public Class VppInterpreter
             ElseIf insset(0) = "#" Then
                 'Comment
             Else
+
                 If state = 1 Then
 
                 Else
@@ -332,7 +368,7 @@ Public Class VppInterpreter
     ''' <param name="message">Exception message.</param>
     ''' <param name="errcode">Error code.</param>
     ''' <param name="severity"></param>
-    Sub exceptionmsg(message As String, errcode As String, Optional severity As Integer = 0)
+    Sub exceptionmsg(message As String, errcode As String, Optional severity As Integer = 0, Optional exitsetup As Boolean = False)
         canexec = False
         Console.WriteLine()
         Console.WriteLine()
@@ -345,8 +381,14 @@ Public Class VppInterpreter
             Console.WriteLine()
             canexec = True
         ElseIf didsetup = False Then
-            Console.WriteLine()
-            canexec = True
+            If exitsetup Then
+                Console.WriteLine("Press any key...")
+                Console.Read()
+                End
+            Else
+                Console.WriteLine()
+                canexec = True
+            End If
         Else
             Console.WriteLine("Press any key...")
             Console.Read()
@@ -355,12 +397,36 @@ Public Class VppInterpreter
     End Sub
 
     Sub execfunc(fname As String, fargs As String())
+        canexec = False
+        tmpval4 = 0
+        tmpval3 = Nothing
+
+        If objects(fname)._fargs.Count >= fargs.Length Then
+            If objects(fname)._fargs IsNot Nothing Then
+                For Each i In fargs
+                    If objects(fname)._fargs(tmpval4) IsNot Nothing Then
+                        tmpval3 = objects(fname)._fargs(tmpval4).Split(" ")
+
+                        If tmpval3.Length > 1 Then
+                            If objects.ContainsKey(fargs(0)) Then
+                                objects.Add(tmpval3(0), New DefineObject(tmpval3(2), objects(fargs(0))))
+                            Else
+                                objects.Add(tmpval3(0), New DefineObject(tmpval3(2), i))
+                            End If
+                        End If
+                    End If
+
+                    tmpval4 += 1
+                Next
+
+            End If
+        End If
+
         tmpip2 = ip - 1
         ip = objects(fname).value - 1
         nf = fname
-        For Each i In fargs
-
-        Next
+        tmpval4 = Nothing
+        canexec = True
     End Sub
 
     Function getvar(insset_getvar As String())
@@ -382,7 +448,11 @@ Public Class VppInterpreter
             If insset(1) = "=" Then
                 'Set variable value
                 If objects.ContainsKey(insset(2)) Then
-                    setvalue(insset(0), getvalue(insset(2)))
+                    If isexpression(insset, 2) Then
+
+                    Else
+                        setvalue(insset(0), getvalue(insset(2)))
+                    End If
                 ElseIf dependencies.ContainsKey(insset(2)) Then
                     If insset(3) = "::" Then
                         If dependencies(insset(2)).objects.ContainsKey(insset(4)) Then
@@ -406,12 +476,12 @@ Public Class VppInterpreter
                     If insset(3) = "=" Then
                         'Set variable value
                         If objects.ContainsKey(insset(4)) Then
-                            dependencies(insset(0)).objects(insset(2)).value = insset(4)
+                            dependencies(insset(0)).setvalue(insset(2), stringa_to_string(insset, 4))
                         Else
                             If gettypefromval(stringa_to_string(insset, 2)) = "string" Then
-                                dependencies(insset(0)).objects(insset(2)).value = stringa_to_string(insset, 4)
+                                dependencies(insset(0)).setvalue(insset(2), stringa_to_string(insset, 4))
                             Else
-                                dependencies(insset(0)).objects(insset(2)).value = insset(4)
+                                dependencies(insset(0)).setvalue(insset(2), insset(4))
                             End If
                         End If
                     Else
@@ -431,14 +501,112 @@ Public Class VppInterpreter
     End Sub
 
     Sub instruction_wait(ByVal stringval() As String)
-        Static parameters As String()
-        parameters = parsearguments(stringval, 1)
-        If Not parameters Is Nothing Then
+        Static wparameters As String()
+        wparameters = parsearguments(stringval, 1)
+        If Not wparameters Is Nothing Then
             canexec = False
-            Thread.Sleep(parameters(0))
+            Thread.Sleep(wparameters(0))
             canexec = True
         End If
     End Sub
+
+    Sub instruction_math(ByVal stringvalmath() As String)
+        If state = 1 Then
+            Exit Sub
+        End If
+        If stringvalmath(1) = "::" Then
+
+        Else
+            exceptionmsg("Invalid syntax.", "g_0001")
+            Exit Sub
+        End If
+        tmpval2 = Nothing
+        tmpval3 = Nothing
+        Static mathparameters As String()
+        mathparameters = parsearguments(stringvalmath, 3)
+        If stringvalmath(2) = "add" Then
+            If gettypefromval(mathparameters(1)) = "int" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If gettypefromval(mathparameters(2)) = "int" Then
+                tmpval3 = mathparameters(2)
+            Else
+                If objects.ContainsKey(mathparameters(2)) Then
+                    tmpval3 = objects(mathparameters(2)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "int" Then
+                    objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) + Convert.ToDecimal(tmpval3)).ToString()
+                End If
+            End If
+        ElseIf stringvalmath(2) = "subtract" Then
+            If gettypefromval(mathparameters(1)) = "int" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If gettypefromval(mathparameters(2)) = "int" Then
+                tmpval3 = mathparameters(2)
+            Else
+                If objects.ContainsKey(mathparameters(2)) Then
+                    tmpval3 = objects(mathparameters(2)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "int" Then
+                    objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) - Convert.ToDecimal(tmpval3)).ToString()
+                End If
+            End If
+        ElseIf stringvalmath(2) = "multiply" Then
+            If gettypefromval(mathparameters(1)) = "int" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If gettypefromval(mathparameters(2)) = "int" Then
+                tmpval3 = mathparameters(2)
+            Else
+                If objects.ContainsKey(mathparameters(2)) Then
+                    tmpval3 = objects(mathparameters(2)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "int" Then
+                    objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) * Convert.ToDecimal(tmpval3)).ToString()
+                End If
+            End If
+        ElseIf stringvalmath(2) = "divide" Then
+            If gettypefromval(mathparameters(1)) = "int" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If gettypefromval(mathparameters(2)) = "int" Then
+                tmpval3 = mathparameters(2)
+            Else
+                If objects.ContainsKey(mathparameters(2)) Then
+                    tmpval3 = objects(mathparameters(2)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "int" Then
+                    objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) / Convert.ToDecimal(tmpval3)).ToString()
+                End If
+            End If
+        End If
+    End Sub
+
 
     Sub instruction_if(ByVal stringvalif() As String)
         If state = 1 Then
@@ -492,39 +660,54 @@ Public Class VppInterpreter
             Exit Sub
         End If
         Try
-            Static parameters As String()
-            parameters = parsearguments(stringval, 1)
-            If parameters(0) = "0x0001" Then
+            Static vaparameters As String()
+            vaparameters = parsearguments(stringval, 1)
+            If vaparameters(0) = "0x0001" Then
                 Try
 
-                    If objects.ContainsKey(parameters(2)) Then
-                        tmpval3 = objects(vppstring_to_string(parameters(2))).value.ToString
+                    If objects.ContainsKey(vaparameters(2)) Then
+                        tmpval3 = objects(vppstring_to_string(vaparameters(2))).value.ToString
                         tmpval = tmpval3.Remove(tmpval3.Length - 2, 1)
                         tmpval1 = tmpval.ToString.Remove(0, 1)
                     Else
-                        tmpval3 = parameters(2)
+                        tmpval3 = vaparameters(2)
                         tmpval = tmpval3.Remove(tmpval3.Length - 2, 1)
                         tmpval1 = tmpval.ToString.Remove(0, 1)
                     End If
-                    If objects.ContainsKey(parameters(3)) Then
-                        tmpval4 = objects(vppstring_to_string(parameters(3))).value.ToString
+                    If objects.ContainsKey(vaparameters(3)) Then
+                        tmpval4 = objects(vppstring_to_string(vaparameters(3))).value.ToString
                         tmpval = tmpval4.Remove(tmpval4.Length - 2, 1)
                         tmpval2 = tmpval.ToString.Remove(0, 1)
                     Else
-                        tmpval4 = parameters(3)
+                        tmpval4 = vaparameters(3)
                         tmpval = tmpval4.Remove(tmpval4.Length - 2, 1)
                         tmpval2 = tmpval.ToString.Remove(0, 1)
                     End If
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = Chr(34) + tmpval1 + tmpval2 + Chr(34)
+                    If objects.ContainsKey(vaparameters(1)) Then
+                        objects(vaparameters(1)).value = Chr(34) + tmpval1 + tmpval2 + Chr(34)
                     Else
-                        exceptionmsg("Could not find/access " + parameters(1), "d_0001", 1)
+                        exceptionmsg("Could not find/access " + vaparameters(1), "d_0001", 1)
+                    End If
+                Catch ex As Exception
+                    exceptionmsg("Internal exception: " + ex.Message + ex.StackTrace, "c_0002")
+                End Try
+            ElseIf vaparameters(0) = "0x0002" Then
+                Try
+                    If objects.ContainsKey(vaparameters(2)) Then
+                        tmpval3 = objects(vppstring_to_string(vaparameters(2))).value
+                    Else
+                        tmpval3 = vaparameters(2)
+                    End If
+                    If objects.ContainsKey(vaparameters(1)) Then
+                        objects(vaparameters(1)).value = Chr(34) + tmpval1 + Chr(34)
+                    Else
+                        exceptionmsg("Could not find/access " + vaparameters(1), "d_0001", 1)
                     End If
                 Catch ex As Exception
                     exceptionmsg("Internal exception: " + ex.Message + ex.StackTrace, "c_0002")
                 End Try
             Else
-                exceptionmsg("Invalid parameters given: " + Chr(34) + parameters(0) + Chr(34), "c_0001")
+                exceptionmsg("Invalid parameters given: " + Chr(34) + vaparameters(0) + Chr(34), "c_0001")
             End If
         Catch ex As Exception
             If TypeOf ex Is NullReferenceException Then
@@ -533,8 +716,35 @@ Public Class VppInterpreter
         End Try
     End Sub
 
-    Function isexpression()
-
+    Function isexpression(insset() As String, startip As String)
+        tmpval4 = parsearguments(insset, startip)
+        tmpval1 = False
+        tmpval2 = False
+        For Each i In tmpval4(0)
+            If i = "+" Then
+                If tmpval2 = False Then
+                    tmpval1 = True
+                End If
+            ElseIf i = "-" Then
+                If tmpval2 = False Then
+                    tmpval1 = True
+                End If
+            ElseIf i = "*" Then
+                If tmpval2 = False Then
+                    tmpval1 = True
+                End If
+            ElseIf i = ":" Then
+                If tmpval2 = False Then
+                    tmpval1 = True
+                End If
+            ElseIf i = Chr(34) Then
+                If tmpval2 = False Then
+                    tmpval2 = True
+                Else
+                    tmpval2 = False
+                End If
+            End If
+        Next
     End Function
 
     Sub instruction_def(ByVal stringval() As String)
@@ -592,26 +802,26 @@ Public Class VppInterpreter
             parameters = parsearguments(stringval, 1)
             log("[" + DateTime.Now.ToString + "]: Command requested. cmdid: " + Chr(34) + parameters(0) + Chr(34) + " args: " + Chr(34) + stringa_to_string(parameters, 1) + Chr(34))
             If parameters(0) = "0x0001" Then
-                Console.Title = vppstring_to_string(parameters(1))
+                If objects.ContainsKey(vppstring_to_string(parameters(1))) Then
+                    Console.Title = objects(parameters(1)).value
+                Else
+                    Console.Title = vppstring_to_string(parameters(1))
+                End If
             ElseIf parameters(0) = "0x0002" Then
                 Console.SetCursorPosition(Convert.ToDecimal(parameters(1)), Convert.ToDecimal(parameters(2)))
             ElseIf parameters(0) = "0x0003" Then
                 Console.Clear()
             ElseIf parameters(0) = "0x0004" Then
-                If gettypefromval(parameters(1)) = "string" Then
-                    Console.Write(vppstring_to_string(parameters(1)))
+                If objects.ContainsKey(vppstring_to_string(parameters(1))) Then
+                    Console.Write(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
                 Else
-                    If objects.ContainsKey(parameters(1)) Then
-                        Console.Write(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
-                    End If
+                    Console.Write(vppstring_to_string(parameters(1)))
                 End If
             ElseIf parameters(0) = "0x0005" Then
-                If gettypefromval(parameters(1)) = "string" Then
-                    Console.WriteLine(vppstring_to_string(parameters(1)))
+                If objects.ContainsKey(vppstring_to_string(parameters(1))) Then
+                    Console.WriteLine(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
                 Else
-                    If objects.ContainsKey(parameters(1)) Then
-                        Console.WriteLine(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
-                    End If
+                    Console.WriteLine(vppstring_to_string(parameters(1)))
                 End If
             ElseIf parameters(0) = "0x0006" Then
                 canexec = False
@@ -761,16 +971,27 @@ Public Class VppInterpreter
                     exceptionmsg("General exception.", "g_0003")
                 End Try
             ElseIf parameters(0) = "0x001A" Then
+                exceptionmsg("The command 0x001A has been deprecated, please use the command 0x001B.", "", 1)
                 Try
                     canexec = False
+                    If objects.ContainsKey(parameters(2)) Then
+                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value).Replace(" ", "")
+                    Else
+                        tmpval2 = vppstring_to_string(parameters(2))
+                    End If
+                    If objects.ContainsKey(parameters(3)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(3))
+                    End If
                     If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = Chr(34) + webreq(vppstring_to_string(parameters(2))) + Chr(34)
+                        objects(parameters(1)).value = Chr(34) + webreq(tmpval2, tmpval1, "GET") + Chr(34)
                     Else
 
                     End If
                     canexec = True
                 Catch ex As Exception
-                    exceptionmsg("General exception. " + ex.Message + vbNewLine + ex.StackTrace, "g_0003")
+                    exceptionmsg("General exception. " + ex.Message + ex.StackTrace, "g_0003")
                 End Try
             ElseIf parameters(0) = "0x001B" Then
                 Try
@@ -786,7 +1007,7 @@ Public Class VppInterpreter
                         tmpval1 = vppstring_to_string(parameters(3))
                     End If
                     If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = Chr(34) + webreq(tmpval2, tmpval1) + Chr(34)
+                        objects(parameters(1)).value = Chr(34) + webreq(tmpval2, tmpval1, parameters(4)) + Chr(34)
                     Else
 
                     End If
@@ -839,6 +1060,9 @@ Public Class VppInterpreter
             If TypeOf ex Is NullReferenceException Then
                 exceptionmsg("Internal exception: " + ex.Message, "c_0002")
             End If
+            canexec = False
+            MsgBox(ex.Message + vbNewLine + ip.ToString + vbNewLine + ex.StackTrace)
+            canexec = True
         End Try
     End Sub
 
@@ -850,9 +1074,25 @@ Public Class VppInterpreter
         End Try
     End Function
 
-    Public Sub setvalue(name As String, value As Object)
+    Public Sub setvalue(name As String, value As Object, Optional _slaveint As Boolean = False)
         Try
-            objects(name).value = value
+            If _slaveint Then
+                If objects(name)._private = False Then
+                    If objects(name)._constant = False Then
+                        objects(name).value = value
+                    Else
+                        exceptionmsg("Variable " + Chr(34) + name + Chr(34) + " is a constant and cannot be changed.", "d_0001")
+                    End If
+                Else
+                    exceptionmsg("Variable " + Chr(34) + name + Chr(34) + " cannot be accessed due to it's protection level.", "d_0001")
+                End If
+            Else
+                If objects(name)._constant = False Then
+                    objects(name).value = value
+                Else
+                    exceptionmsg("Variable " + Chr(34) + name + Chr(34) + " is a constant and cannot be changed.", "d_0001")
+                End If
+            End If
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical, "setvalue")
         End Try
@@ -876,7 +1116,7 @@ Public Class VppInterpreter
 
     Public Function parsearguments(arguments() As String, startip As Integer)
         tmpip = 0
-        Dim val() As String = New String(200) {}
+        Dim val As New List(Of String)
         Dim tempip = 0
         Dim tempip1 = 0
         Dim ignore = False
@@ -884,6 +1124,7 @@ Public Class VppInterpreter
             Throw New Exception
         End If
         For Each i In arguments
+            val.Add("")
             If tempip >= startip Then
                 For Each i1 In i
                     If i1 = "," Then
@@ -891,6 +1132,7 @@ Public Class VppInterpreter
                             val(tempip1) = val(tempip1) + i1
                         Else
                             tempip1 = tempip1 + 1
+                            val.Add("")
                         End If
                     ElseIf i1 = "(" Then
                         If ignore = True Then
@@ -918,7 +1160,7 @@ Public Class VppInterpreter
             tempip = tempip + 1
         Next
         tmpip = tempip
-        Return val
+        Return val.ToArray()
     End Function
 
     ''' <summary>
@@ -942,7 +1184,7 @@ Public Class VppInterpreter
     ''' <param name="requrl">URL Path</param>
     ''' <param name="uploadstr">String for post request.</param>
     ''' <returns>Response.</returns>
-    Function webreq(requrl As String, uploadstr As String)
+    Function webreq(requrl As String, uploadstr As String, method As String)
         Dim wc As New WebClient
 
         tmpval2 = "null"
@@ -952,7 +1194,7 @@ Public Class VppInterpreter
         Next
 
         Try
-            tmpval2 = wc.UploadString(requrl, "POST", uploadstr)
+            tmpval2 = wc.UploadString(requrl, vppstring_to_string(method), uploadstr)
         Catch ex As WebException
             tmpval2 = "null"
         End Try
@@ -996,13 +1238,33 @@ Public Class VppInterpreter
         End If
     End Function
 
-    Function gettypefromval(value As Object)
+    Function gettypefromval(value As String)
         If value.Contains(Chr(34)) Then
             Return "string"
         ElseIf value = "true" Then
             Return "bool"
         ElseIf value = "false" Then
             Return "bool"
+        ElseIf value = "0" Then
+            Return "int"
+        ElseIf value = "1" Then
+            Return "int"
+        ElseIf value = "2" Then
+            Return "int"
+        ElseIf value = "3" Then
+            Return "int"
+        ElseIf value = "4" Then
+            Return "int"
+        ElseIf value = "5" Then
+            Return "int"
+        ElseIf value = "6" Then
+            Return "int"
+        ElseIf value = "7" Then
+            Return "int"
+        ElseIf value = "8" Then
+            Return "int"
+        ElseIf value = "9" Then
+            Return "int"
         ElseIf value.Remove(1) = "0" Then
             Return "int"
         ElseIf value.Remove(1) = "1" Then

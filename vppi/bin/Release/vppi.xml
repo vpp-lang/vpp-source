@@ -48,7 +48,7 @@ vppi
  </summary>
  <param name="fpath">File path to the dependency.</param>
 </member>
-<member name="M:vppi.VppInterpreter.exceptionmsg(System.String,System.String,System.Int32,System.Boolean)">
+<member name="M:vppi.VppInterpreter.exceptionmsg(System.String,System.String,System.Int32)">
  <summary>
  Exception message. Check https://github.com/VMGP/vppi/wiki
  </summary>
@@ -63,7 +63,7 @@ vppi
  <param name="requrl">URL Path</param>
  <returns>Response.</returns>
 </member>
-<member name="M:vppi.VppInterpreter.webreq(System.String,System.String,System.String)">
+<member name="M:vppi.VppInterpreter.webreq(System.String,System.String)">
  <summary>
  Web request with POST.
  </summary>
