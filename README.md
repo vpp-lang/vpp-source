@@ -3,7 +3,7 @@
     <img width="80" src="https://raw.githubusercontent.com/vpp-lang/vppi/main/vppicon.png">
 </p>
 
-# vppi (V++ Interpreter)
+# V++ Interpreter (vppi)
 <a><img src="https://img.shields.io/maintenance/yes/2021"></a>
 <a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/vpp-lang/vppi?label=stable%20release"></a>
 <a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/vpp-lang/vppi?include_prereleases&label=latest%20(pre)release"></a>
