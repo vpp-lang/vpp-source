@@ -53,3 +53,8 @@ Made a lot of progress, the syntax of V++ in 2019 is very similar to the one in 
 Released V++ ```1.0.0.0``` on 19 Nov 2020.
 ## 2021
 First prerelease of V++.
+
+# Bugs, feauture requests and discussions
+To report bugs or request new feautures go to the Issues tab or [click here](https://github.com/vpp-lang/vppi/issues).
+
+For discussions/requesting a library/dependecy for the V++ package manager go to the discussions tab or [click here](https://github.com/vpp-lang/vppi/discussions).
