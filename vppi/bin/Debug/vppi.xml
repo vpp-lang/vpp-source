@@ -27,6 +27,26 @@ vppi
  The V++ interpreter class. Check https://github.com/VMGP/vppi/wiki.
  </summary>
 </member>
+<member name="T:vppi.VppInterpreter.DefineObject">
+ <summary>
+ Define object for variables.
+ </summary>
+</member>
+<member name="F:vppi.VppInterpreter.CallStackObject.returnip">
+ <summary>
+ Location of the function.
+ </summary>
+</member>
+<member name="F:vppi.VppInterpreter.CallStackObject.returnname">
+ <summary>
+ Name of the function.
+ </summary>
+</member>
+<member name="F:vppi.VppInterpreter.CallStackObject.returnfname">
+ <summary>
+ Full name.
+ </summary>
+</member>
 <member name="M:vppi.VppInterpreter.startinterpret">
  <summary>
  Start interpreting the script.
@@ -70,6 +90,13 @@ vppi
  <param name="requrl">URL Path</param>
  <param name="uploadstr">String for post request.</param>
  <returns>Response.</returns>
+</member>
+<member name="M:vppi.VppInterpreter.comwatch_Changed(System.Object,System.IO.FileSystemEventArgs)">
+ <summary>
+ Communication file changed.
+ </summary>
+ <param name="sender"></param>
+ <param name="e"></param>
 </member>
 </members>
 </doc>

@@ -10,12 +10,18 @@ Imports System.IO
 Imports System.Net
 Imports System.Web
 Imports System.Web.Script.Serialization
+Imports System.Runtime.InteropServices
 
 ''' <summary>
 ''' The V++ interpreter class. Check https://github.com/VMGP/vppi/wiki.
 ''' </summary>
 Public Class VppInterpreter
+
     Public threadname
+
+    ''' <summary>
+    ''' Define object for variables.
+    ''' </summary>
     Public Class DefineObject
         Public value = Nothing
         Public type = Nothing
@@ -27,6 +33,29 @@ Public Class VppInterpreter
         Sub New(Optional _type As String = Nothing, Optional _value As Object = Nothing)
             type = _type
             value = _value
+        End Sub
+    End Class
+
+    Public Class CallStackObject
+        ''' <summary>
+        ''' Location of the function.
+        ''' </summary>
+        Public returnip As Integer = Nothing
+
+        ''' <summary>
+        ''' Name of the function.
+        ''' </summary>
+        Public returnname As String = Nothing
+
+        ''' <summary>
+        ''' Full name.
+        ''' </summary>
+        Public returnfname As String = Nothing
+
+        Sub New(_returnip As Integer, _returnname As String, Optional _returnfname As String = "vpp :: function ()")
+            returnip = _returnip
+            returnname = _returnname
+            returnfname = _returnfname
         End Sub
     End Class
 
@@ -56,9 +85,13 @@ Public Class VppInterpreter
     Public slave = False
     Public logfilename = ""
     Public logfile As StreamWriter
+    Public config As Dictionary(Of String, Object)
     Dim invalidreserved As String() = {"#", "@", "!", "+", "-", "/", "*", "^", "vppmath", "command", "exit", "wait", "varop", "string", "int", "bool"}
 
     'Events
+    Public eventhandlers As Dictionary(Of String, String)
+    Public nv_eventname As String = ""
+    Dim systemevents As String() = {"ReceivedCommandFromComFile"}
 
     'Variable defining and similar stuff
     Public nv_const = False
@@ -68,20 +101,42 @@ Public Class VppInterpreter
     'Web Requests
     Public webheaders As New Dictionary(Of String, String)
 
-    Sub New(fpath As String, Optional _slave As Boolean = False)
+    'File communication
+    WithEvents comwatch As New FileSystemWatcher
+    Public cancommunicate = False
+
+    'Call stack
+    Public callstack As New Stack(Of CallStackObject)
+
+    <DllImport("kernel32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+    Private Shared Function GetConsoleWindow() As IntPtr
+
+    End Function
+
+    <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+    Private Shared Function ShowWindow(hWnd As IntPtr, cmdShow As Integer) As Boolean
+
+    End Function
+
+    Sub New(fpath As String, Optional _slave As Boolean = False, Optional _config As Dictionary(Of String, Object) = Nothing)
         Try
             If Path.GetExtension(fpath) = ".vpp" Then
 
             Else
-                MsgBox("Failed to load script.", MsgBoxStyle.Critical, "V++ Interpreter")
+                MsgBox("Failed to load script. [s_0001]", MsgBoxStyle.Critical, "V++ Interpreter")
+                End
             End If
             code = File.ReadAllText(fpath)
-            logfilename = "\log_" + Path.GetFileNameWithoutExtension(fpath) + "_" + DateTime.Now.Hour.ToString + DateTime.Now.Minute.ToString + DateTime.Now.Second.ToString + ".txt"
+            config = _config
+            logfilename = "/log_" + Path.GetFileNameWithoutExtension(fpath) + "_" + DateTime.Now.Hour.ToString + DateTime.Now.Minute.ToString + DateTime.Now.Second.ToString + ".txt"
             slave = _slave
             threadname = Path.GetFileNameWithoutExtension(fpath)
+            comwatch.NotifyFilter = NotifyFilters.LastWrite
+            comwatch.Path = Module1.getappcomdir()
             startinterpret()
         Catch ex As Exception
-            MsgBox("Failed to load script.", MsgBoxStyle.Critical, "V++ Interpreter")
+            MsgBox("Failed to load script. [s_0001]", "V++ Interpreter")
+            End
         End Try
     End Sub
 
@@ -96,9 +151,28 @@ Public Class VppInterpreter
         If slave = False Then
             logfile = File.CreateText(Module1.getapplogsdir() + logfilename)
             logfile.AutoFlush = True
-            starttimer = 100
-            ticktimer = New Threading.Timer(AddressOf tick, Nothing, 0, starttimer)
+            log("[" + DateTime.Now.ToString + "-S]: Script " + Chr(34) + threadname + Chr(34) + " was loaded successfully.")
+            log("[" + DateTime.Now.ToString + "-S]: Configuring V++...")
+            tmpval = 0
+            tmpval1 = 0
+            While config Is Nothing
+                If tmpval1 > 2000 Then
+                    tmpval1 = 0
+                    tmpval += 1
+                    log("[" + DateTime.Now.ToString + "-S]: Configuring V++... (" + tmpval.ToString + "/100 tries)")
+
+                    If tmpval > 99 Then
+                        log("[" + DateTime.Now.ToString + "-S]: Failed to configure V++.")
+                        MsgBox("Failed to load script. [s_0003]", MsgBoxStyle.Critical, "V++ Interpreter")
+                        End
+                    End If
+                End If
+
+                    tmpval1 += 1
+            End While
+            starttimer = config("vppi_exec_delay")
             log("[" + DateTime.Now.ToString + "]: Setting up...")
+            ticktimer = New Threading.Timer(AddressOf tick, Nothing, 0, starttimer)
             While True
 
             End While
@@ -188,6 +262,12 @@ Public Class VppInterpreter
                 include(sinsset(1))
             ElseIf sinsset(0) = "@IgnoreErrors" Then
                 ignoreerr = True
+            ElseIf sinsset(0) = "@ComFileName" Then
+                If config("vppi_allow_interprocess_communication") = True Then
+                    comwatch.Filter = sinsset(1)
+                    My.Computer.FileSystem.WriteAllText(comwatch.Filter, "", False)
+                    cancommunicate = True
+                End If
             ElseIf sinsset(0) = "[private]" Then
 
             ElseIf sinsset(0) = "function" Then
@@ -199,10 +279,12 @@ Public Class VppInterpreter
                     objects(sinsset(1))._fargs = parsearguments(sinsset, 2)
                     log("[" + DateTime.Now.ToString + "-S]: Defined function " + sinsset(1) + ", ip: " + tmpip.ToString)
                 End If
-
+                If systemevents.Contains(nv_eventname) Then
+                    eventhandlers.Add(nv_eventname, tmpip)
+                End If
             ElseIf sinsset(0) = "@HandleEvent" Then
-                If sinsset(1) = "InputEvent" Then
-                    tmpval = "InputEvent"
+                If systemevents.Contains(sinsset(1)) Then
+                    nv_eventname = sinsset(1)
                 End If
             Else
 
@@ -306,6 +388,15 @@ Public Class VppInterpreter
                 Else
                     End
                 End If
+            ElseIf insset(0) = "break" Then
+                If state = 1 Then
+
+                Else
+                    If insset(1) = "function" Then
+                        cf = ""
+                        flushtempvars()
+                    End If
+                End If
             ElseIf insset(0) = "wait" Then
                 instruction_wait(insset)
             ElseIf insset(0) = "varop" Then
@@ -318,6 +409,12 @@ Public Class VppInterpreter
                 nv_const = True
             ElseIf insset(0) = "[temp]" Then
                 nv_temp = True
+            ElseIf insset(0) = "gotolast" Then
+                If callstack.Peek() IsNot Nothing Then
+                    ip = callstack.Peek().returnip
+                    nf = callstack.Peek().returnname
+                    callstack.Pop()
+                End If
             ElseIf insset(0) = "function" Then
 
             ElseIf insset(0) = "if" Then
@@ -373,10 +470,11 @@ Public Class VppInterpreter
         Console.WriteLine()
         Console.WriteLine()
         If severity = 0 Then
-            Console.WriteLine("Error: [" + errcode + "] at " + threadname + " (" + (ip + 1).ToString + "): " + message)
+            Console.WriteLine("Error: [" + errcode + ":" + (ip + 1).ToString + "] at " + threadname + ": " + message)
         ElseIf severity = 1 Then
-            Console.WriteLine("Warning: [" + errcode + "] at " + threadname + " (" + (ip + 1).ToString + "): " + message)
+            Console.WriteLine("Warning: [" + errcode + ":" + (ip + 1).ToString + "] at " + threadname + ": " + message)
         End If
+        Console.WriteLine(returnstrace())
         If ignoreerr = True Then
             Console.WriteLine()
             canexec = True
@@ -396,27 +494,46 @@ Public Class VppInterpreter
         End If
     End Sub
 
+    Function returnstrace()
+        tmpval4 = callstack.ToArray()
+        tmpval3 = "Call stack:" + vbNewLine
+        For Each i As CallStackObject In tmpval4
+            tmpval3 += "      at [" + i.returnip.ToString + "] " + i.returnfname + vbNewLine
+        Next
+        Return tmpval3
+    End Function
+
     Sub execfunc(fname As String, fargs As String())
         canexec = False
-        tmpval4 = 0
+        callstack.Push(New CallStackObject(ip, cf, threadname + " :: " + cf))
+        tmpip1 = 0
         tmpval3 = Nothing
 
         If objects(fname)._fargs.Count >= fargs.Length Then
             If objects(fname)._fargs IsNot Nothing Then
                 For Each i In fargs
-                    If objects(fname)._fargs(tmpval4) IsNot Nothing Then
-                        tmpval3 = objects(fname)._fargs(tmpval4).Split(" ")
+                    If objects(fname)._fargs(tmpip1) IsNot Nothing And objects(fname)._fargs(tmpip1).Length > 1 Then
+                        tmpval3 = objects(fname)._fargs(tmpip1).Split(" ")
 
                         If tmpval3.Length > 1 Then
                             If objects.ContainsKey(fargs(0)) Then
                                 objects.Add(tmpval3(0), New DefineObject(tmpval3(2), objects(fargs(0))))
                             Else
-                                objects.Add(tmpval3(0), New DefineObject(tmpval3(2), i))
+                                Try
+
+                                    objects.Add(tmpval3(0), New DefineObject(tmpval3(2), i))
+                                Catch ex As Exception
+
+                                End Try
+
                             End If
                         End If
                     End If
 
-                    tmpval4 += 1
+                    If tmpip1 < objects(fname)._fargs.Length - 1 Then
+                        tmpip1 += 1
+                    End If
+
                 Next
 
             End If
@@ -604,6 +721,26 @@ Public Class VppInterpreter
                     objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) / Convert.ToDecimal(tmpval3)).ToString()
                 End If
             End If
+        ElseIf stringvalmath(2) = "mod" Then
+            If gettypefromval(mathparameters(1)) = "int" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If gettypefromval(mathparameters(2)) = "int" Then
+                tmpval3 = mathparameters(2)
+            Else
+                If objects.ContainsKey(mathparameters(2)) Then
+                    tmpval3 = objects(mathparameters(2)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "int" Then
+                    objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) Mod Convert.ToDecimal(tmpval3)).ToString()
+                End If
+            End If
         End If
     End Sub
 
@@ -663,6 +800,7 @@ Public Class VppInterpreter
             Static vaparameters As String()
             vaparameters = parsearguments(stringval, 1)
             If vaparameters(0) = "0x0001" Then
+                'Merges 2 strings.
                 Try
 
                     If objects.ContainsKey(vaparameters(2)) Then
@@ -692,6 +830,7 @@ Public Class VppInterpreter
                     exceptionmsg("Internal exception: " + ex.Message + ex.StackTrace, "c_0002")
                 End Try
             ElseIf vaparameters(0) = "0x0002" Then
+                'Converts bool/int to string
                 Try
                     If objects.ContainsKey(vaparameters(2)) Then
                         tmpval3 = objects(vppstring_to_string(vaparameters(2))).value
@@ -699,7 +838,23 @@ Public Class VppInterpreter
                         tmpval3 = vaparameters(2)
                     End If
                     If objects.ContainsKey(vaparameters(1)) Then
-                        objects(vaparameters(1)).value = Chr(34) + tmpval1 + Chr(34)
+                        objects(vaparameters(1)).value = Chr(34) + tmpval3 + Chr(34)
+                    Else
+                        exceptionmsg("Could not find/access " + vaparameters(1), "d_0001", 1)
+                    End If
+                Catch ex As Exception
+                    exceptionmsg("Internal exception: " + ex.Message + ex.StackTrace, "c_0002")
+                End Try
+            ElseIf vaparameters(0) = "0x0003" Then
+                'Converts string to int
+                Try
+                    If objects.ContainsKey(vaparameters(2)) Then
+                        tmpval3 = Convert.ToDecimal(objects(vppstring_to_string(vaparameters(2))).value).ToString()
+                    Else
+                        tmpval3 = Convert.ToDecimal(vaparameters(2)).ToString()
+                    End If
+                    If objects.ContainsKey(vaparameters(1)) Then
+                        objects(vaparameters(1)).value = tmpval3
                     Else
                         exceptionmsg("Could not find/access " + vaparameters(1), "d_0001", 1)
                     End If
@@ -971,7 +1126,6 @@ Public Class VppInterpreter
                     exceptionmsg("General exception.", "g_0003")
                 End Try
             ElseIf parameters(0) = "0x001A" Then
-                exceptionmsg("The command 0x001A has been deprecated, please use the command 0x001B.", "", 1)
                 Try
                     canexec = False
                     If objects.ContainsKey(parameters(2)) Then
@@ -979,13 +1133,8 @@ Public Class VppInterpreter
                     Else
                         tmpval2 = vppstring_to_string(parameters(2))
                     End If
-                    If objects.ContainsKey(parameters(3)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
-                    Else
-                        tmpval1 = vppstring_to_string(parameters(3))
-                    End If
                     If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = Chr(34) + webreq(tmpval2, tmpval1, "GET") + Chr(34)
+                        objects(parameters(1)).value = Chr(34) + webreq(tmpval2) + Chr(34)
                     Else
 
                     End If
@@ -1053,6 +1202,18 @@ Public Class VppInterpreter
                 Catch ex As Exception
                     exceptionmsg("General exception.", "g_0003")
                 End Try
+            ElseIf parameters(0) = "0x0020" Then
+                ShowWindow(GetConsoleWindow(), 0)
+            ElseIf parameters(0) = "0x0021" Then
+                ShowWindow(GetConsoleWindow(), 1)
+            ElseIf parameters(0) = "0x0022" Then
+                If cancommunicate Then
+                    If objects.ContainsKey(parameters(1)) Then
+                        command(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                    Else
+                        command(vppstring_to_string(parameters(1)))
+                    End If
+                End If
             Else
                 exceptionmsg("Invalid parameters given: " + Chr(34) + parameters(0) + Chr(34), "c_0001")
             End If
@@ -1094,7 +1255,8 @@ Public Class VppInterpreter
                 End If
             End If
         Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Critical, "setvalue")
+            canexec = False
+            MsgBox(ex.Message + vbNewLine + ex.StackTrace + vbNewLine + ip.ToString + vbNewLine + threadname + vbNewLine + didsetup.ToString + name, MsgBoxStyle.Critical, "setvalue")
         End Try
     End Sub
 
@@ -1372,9 +1534,19 @@ Public Class VppInterpreter
         Return tmpval_stra
     End Function
 
-    Function conditionval()
-
+    Function generatecommand(command As String)
+        tmpval4 = ""
+        tmpval4 = "{" + vbNewLine
+        tmpval4 += Chr(9) + Chr(34) + "source" + Chr(34) + ": " + Chr(34) + "vpp" + Chr(34) + "," + vbNewLine
+        tmpval4 += Chr(9) + Chr(34) + "sourceclass" + Chr(34) + ": " + Chr(34) + threadname + Chr(34) + "," + vbNewLine
+        tmpval4 += Chr(9) + Chr(34) + "command" + Chr(34) + ": " + Chr(34) + command + Chr(34) + vbNewLine
+        tmpval4 += "}"
+        Return tmpval4
     End Function
+
+    Sub command(commandstr As String)
+        My.Computer.FileSystem.WriteAllText(comwatch.Filter, generatecommand(commandstr), False)
+    End Sub
 
     Sub log(logmsg As String)
         If slave = False Then
@@ -1382,7 +1554,32 @@ Public Class VppInterpreter
         End If
     End Sub
 
+    Sub invokeevent(eventname, args)
+        If cf = nf Then
+            callstack.Push(New CallStackObject(ip, cf, threadname + " :: " + cf))
+        End If
+        execfunc(eventhandlers(eventname), args)
+    End Sub
 
+    ''' <summary>
+    ''' Communication file changed.
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub comwatch_Changed(sender As Object, e As FileSystemEventArgs) Handles comwatch.Changed
+        Dim comdata As Dictionary(Of String, String) = parsecomfile(Module1.getappcomdir() + "/" + comwatch.Filter)
+        If comdata("source") = "vpp" Then
+
+        Else
+            invokeevent("ReceivedCommandFromComFile", comdata.ToArray())
+        End If
+    End Sub
+
+    Function parsecomfile(data As String)
+        Dim jss As New JavaScriptSerializer()
+        Dim dict As Dictionary(Of String, Object) = jss.Deserialize(Of Dictionary(Of String, Object))(data)
+        Return dict
+    End Function
 #End Region
 
 End Class
