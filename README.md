@@ -20,6 +20,9 @@ This is the V++ interpreter from the V++ programming language package. In order 
 
 In case you want to create V++ scripts and need syntax highlighting, you can [install the official V++ VSCode extension](https://marketplace.visualstudio.com/items?itemName=VMGPOfficial.vpp)
 
+## WARNING
+Indents must be used with tabs, not spaces. If you use space indents, the interpreter will not execute the code.
+
 ## Sample code
 ```
 
