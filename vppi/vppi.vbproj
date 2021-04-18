@@ -130,6 +130,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="VppInterpreter.vb" />
+    <Compile Include="WindowUIManager.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -166,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="newvpplogo.ico" />
+    <None Include="Resources\VppWindowIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

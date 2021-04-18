@@ -67,12 +67,27 @@ Public Class VppInterpreter
     Private tmpip = 0 'temp pointer 1
     Private tmpip1 = 0 'temp pointer 2
     Private tmpip2 = -1 'temp pointer 3
+
     Private tmpval = Nothing 'temp value
     Private tmpval1 = Nothing 'temp value 1
     Private tmpval2 = Nothing 'temp value 2 
     Private tmpval3 = Nothing 'temp value 3 
     Private tmpval4 = Nothing 'temp value 4
+
     Private tmpval5 As New List(Of String)
+
+    Private atmpval1 = Nothing
+    Private atmpval2 = Nothing
+    Private atmpval3 = Nothing
+    Private atmpval4 = Nothing
+    Private atmpval5 = Nothing
+    Private atmpval6 = Nothing
+    Private atmpval7 = Nothing
+    Private atmpval8 = Nothing
+    Private atmpval9 = Nothing
+    Private atmpval10 = Nothing
+    Private atmpval11 = Nothing
+
     Private canexec = True 'can execute
     Private state = 0 'in "if" statement
     Private starttimer As Integer 'timer value
@@ -86,7 +101,9 @@ Public Class VppInterpreter
     Public logfilename = ""
     Public logfile As StreamWriter
     Public config As Dictionary(Of String, Object)
-    Dim invalidreserved As String() = {"#", "@", "!", "+", "-", "/", "*", "^", "vppmath", "command", "exit", "wait", "varop", "string", "int", "bool"}
+    Dim invalidreserved As String() = {"#", "@", "!", "+", "-", "/", "*", "^", ":", "vppmath", "command", "exit", "wait", "varop", "string", "int", "number", "bool"}
+    Public scriptdir = ""
+    Public nowarn = False
 
     'Events
     Public eventhandlers As Dictionary(Of String, String)
@@ -107,6 +124,10 @@ Public Class VppInterpreter
 
     'Call stack
     Public callstack As New Stack(Of CallStackObject)
+    Public usecallstack As Boolean = False
+
+    'UI Stuff
+    Public guiwindow As WindowUIManager
 
     <DllImport("kernel32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
     Private Shared Function GetConsoleWindow() As IntPtr
@@ -130,12 +151,13 @@ Public Class VppInterpreter
             config = _config
             logfilename = "/log_" + Path.GetFileNameWithoutExtension(fpath) + "_" + DateTime.Now.Hour.ToString + DateTime.Now.Minute.ToString + DateTime.Now.Second.ToString + ".txt"
             slave = _slave
+            scriptdir = Directory.GetParent(fpath).FullName
             threadname = Path.GetFileNameWithoutExtension(fpath)
             comwatch.NotifyFilter = NotifyFilters.LastWrite
             comwatch.Path = Module1.getappcomdir()
             startinterpret()
         Catch ex As Exception
-            MsgBox("Failed to load script. [s_0001]", "V++ Interpreter")
+            MsgBox("Failed to load script. [s_0001]", MsgBoxStyle.Critical, "V++ Interpreter")
             End
         End Try
     End Sub
@@ -170,6 +192,7 @@ Public Class VppInterpreter
 
                     tmpval1 += 1
             End While
+            cancommunicate = config("vppi_allow_interprocess_communication")
             starttimer = config("vppi_exec_delay")
             log("[" + DateTime.Now.ToString + "]: Setting up...")
             ticktimer = New Threading.Timer(AddressOf tick, Nothing, 0, starttimer)
@@ -240,6 +263,8 @@ Public Class VppInterpreter
 
             End Try
 
+
+
             sinsset = Split(steststring)
 
             sinsset(0) = ""
@@ -262,6 +287,8 @@ Public Class VppInterpreter
                 include(sinsset(1))
             ElseIf sinsset(0) = "@IgnoreErrors" Then
                 ignoreerr = True
+            ElseIf sinsset(0) = "@EnableCallStack" Then
+                usecallstack = True
             ElseIf sinsset(0) = "@ComFileName" Then
                 If config("vppi_allow_interprocess_communication") = True Then
                     comwatch.Filter = sinsset(1)
@@ -326,6 +353,11 @@ Public Class VppInterpreter
                 Catch ex As ArgumentOutOfRangeException
                     teststring = ""
                 End Try
+
+                If teststring.Contains("int") Then
+                    teststring.Replace("int", "number")
+                    exceptionmsg("The ""int"" type is deprecated. Please use ""number"" instead.", "g_0005", 1)
+                End If
 
                 insset = Split(teststring)
                 execfunction(insset, teststring.Length)
@@ -410,10 +442,14 @@ Public Class VppInterpreter
             ElseIf insset(0) = "[temp]" Then
                 nv_temp = True
             ElseIf insset(0) = "gotolast" Then
-                If callstack.Peek() IsNot Nothing Then
-                    ip = callstack.Peek().returnip
-                    nf = callstack.Peek().returnname
-                    callstack.Pop()
+                If usecallstack = True Then
+                    If callstack.Peek() IsNot Nothing Then
+                        ip = callstack.Peek().returnip
+                        nf = callstack.Peek().returnname
+                        callstack.Pop()
+                    End If
+                Else
+                    exceptionmsg("Call stack is not enabled.", "g_0003")
                 End If
             ElseIf insset(0) = "function" Then
 
@@ -431,6 +467,15 @@ Public Class VppInterpreter
                 ElseIf insset(1) = "function" Then
                     cf = ""
                     flushtempvars()
+                    If usecallstack = True Then
+                        If callstack.Peek() IsNot Nothing Then
+                            ip = callstack.Peek().returnip
+                            nf = callstack.Peek().returnname
+                            callstack.Pop()
+                        End If
+                    Else
+
+                    End If
                 End If
             ElseIf insset(0) = "#" Then
                 'Comment
@@ -472,6 +517,9 @@ Public Class VppInterpreter
         If severity = 0 Then
             Console.WriteLine("Error: [" + errcode + ":" + (ip + 1).ToString + "] at " + threadname + ": " + message)
         ElseIf severity = 1 Then
+            If nowarn = True Then
+                Exit Sub
+            End If
             Console.WriteLine("Warning: [" + errcode + ":" + (ip + 1).ToString + "] at " + threadname + ": " + message)
         End If
         Console.WriteLine(returnstrace())
@@ -495,17 +543,23 @@ Public Class VppInterpreter
     End Sub
 
     Function returnstrace()
-        tmpval4 = callstack.ToArray()
-        tmpval3 = "Call stack:" + vbNewLine
-        For Each i As CallStackObject In tmpval4
-            tmpval3 += "      at [" + i.returnip.ToString + "] " + i.returnfname + vbNewLine
-        Next
-        Return tmpval3
+        If usecallstack = True Then
+            tmpval4 = callstack.ToArray()
+            tmpval3 = "Call stack:" + vbNewLine
+            For Each i As CallStackObject In tmpval4
+                tmpval3 += "      at [" + i.returnip.ToString + "] " + i.returnfname + vbNewLine
+            Next
+            Return tmpval3
+        Else
+            Return ""
+        End If
     End Function
 
     Sub execfunc(fname As String, fargs As String())
         canexec = False
-        callstack.Push(New CallStackObject(ip, cf, threadname + " :: " + cf))
+        If usecallstack = True Then
+            callstack.Push(New CallStackObject(ip, cf, threadname + " :: " + cf))
+        End If
         tmpip1 = 0
         tmpval3 = Nothing
 
@@ -642,14 +696,14 @@ Public Class VppInterpreter
         Static mathparameters As String()
         mathparameters = parsearguments(stringvalmath, 3)
         If stringvalmath(2) = "add" Then
-            If gettypefromval(mathparameters(1)) = "int" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
                 tmpval2 = mathparameters(1)
             Else
                 If objects.ContainsKey(mathparameters(1)) Then
                     tmpval2 = objects(mathparameters(1)).value
                 End If
             End If
-            If gettypefromval(mathparameters(2)) = "int" Then
+            If gettypefromval(mathparameters(2)) = "number" Then
                 tmpval3 = mathparameters(2)
             Else
                 If objects.ContainsKey(mathparameters(2)) Then
@@ -657,19 +711,19 @@ Public Class VppInterpreter
                 End If
             End If
             If objects.ContainsKey(mathparameters(0)) Then
-                If objects(mathparameters(0)).type = "int" Then
+                If objects(mathparameters(0)).type = "number" Then
                     objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) + Convert.ToDecimal(tmpval3)).ToString()
                 End If
             End If
         ElseIf stringvalmath(2) = "subtract" Then
-            If gettypefromval(mathparameters(1)) = "int" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
                 tmpval2 = mathparameters(1)
             Else
                 If objects.ContainsKey(mathparameters(1)) Then
                     tmpval2 = objects(mathparameters(1)).value
                 End If
             End If
-            If gettypefromval(mathparameters(2)) = "int" Then
+            If gettypefromval(mathparameters(2)) = "number" Then
                 tmpval3 = mathparameters(2)
             Else
                 If objects.ContainsKey(mathparameters(2)) Then
@@ -677,19 +731,19 @@ Public Class VppInterpreter
                 End If
             End If
             If objects.ContainsKey(mathparameters(0)) Then
-                If objects(mathparameters(0)).type = "int" Then
+                If objects(mathparameters(0)).type = "number" Then
                     objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) - Convert.ToDecimal(tmpval3)).ToString()
                 End If
             End If
         ElseIf stringvalmath(2) = "multiply" Then
-            If gettypefromval(mathparameters(1)) = "int" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
                 tmpval2 = mathparameters(1)
             Else
                 If objects.ContainsKey(mathparameters(1)) Then
                     tmpval2 = objects(mathparameters(1)).value
                 End If
             End If
-            If gettypefromval(mathparameters(2)) = "int" Then
+            If gettypefromval(mathparameters(2)) = "number" Then
                 tmpval3 = mathparameters(2)
             Else
                 If objects.ContainsKey(mathparameters(2)) Then
@@ -697,19 +751,19 @@ Public Class VppInterpreter
                 End If
             End If
             If objects.ContainsKey(mathparameters(0)) Then
-                If objects(mathparameters(0)).type = "int" Then
+                If objects(mathparameters(0)).type = "number" Then
                     objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) * Convert.ToDecimal(tmpval3)).ToString()
                 End If
             End If
         ElseIf stringvalmath(2) = "divide" Then
-            If gettypefromval(mathparameters(1)) = "int" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
                 tmpval2 = mathparameters(1)
             Else
                 If objects.ContainsKey(mathparameters(1)) Then
                     tmpval2 = objects(mathparameters(1)).value
                 End If
             End If
-            If gettypefromval(mathparameters(2)) = "int" Then
+            If gettypefromval(mathparameters(2)) = "number" Then
                 tmpval3 = mathparameters(2)
             Else
                 If objects.ContainsKey(mathparameters(2)) Then
@@ -717,19 +771,19 @@ Public Class VppInterpreter
                 End If
             End If
             If objects.ContainsKey(mathparameters(0)) Then
-                If objects(mathparameters(0)).type = "int" Then
+                If objects(mathparameters(0)).type = "number" Then
                     objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) / Convert.ToDecimal(tmpval3)).ToString()
                 End If
             End If
         ElseIf stringvalmath(2) = "mod" Then
-            If gettypefromval(mathparameters(1)) = "int" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
                 tmpval2 = mathparameters(1)
             Else
                 If objects.ContainsKey(mathparameters(1)) Then
                     tmpval2 = objects(mathparameters(1)).value
                 End If
             End If
-            If gettypefromval(mathparameters(2)) = "int" Then
+            If gettypefromval(mathparameters(2)) = "number" Then
                 tmpval3 = mathparameters(2)
             Else
                 If objects.ContainsKey(mathparameters(2)) Then
@@ -737,8 +791,28 @@ Public Class VppInterpreter
                 End If
             End If
             If objects.ContainsKey(mathparameters(0)) Then
-                If objects(mathparameters(0)).type = "int" Then
+                If objects(mathparameters(0)).type = "number" Then
                     objects(mathparameters(0)).value = (Convert.ToDecimal(tmpval2) Mod Convert.ToDecimal(tmpval3)).ToString()
+                End If
+            End If
+        ElseIf stringvalmath(2) = "random" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If gettypefromval(mathparameters(2)) = "number" Then
+                tmpval3 = mathparameters(2)
+            Else
+                If objects.ContainsKey(mathparameters(2)) Then
+                    tmpval3 = objects(mathparameters(2)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "number" Then
+                    objects(mathparameters(0)).value = New Random().Next(tmpval2, tmpval3).ToString()
                 End If
             End If
         End If
@@ -908,7 +982,7 @@ Public Class VppInterpreter
         End If
         tmpval = Nothing
         If stringval(2) = "as" Then
-            If gettypefromval(stringval(1)) = "int" Then
+            If gettypefromval(stringval(1)) = "number" Then
                 exceptionmsg("Failed to define variable.", "d_0001")
             ElseIf gettypefromval(stringval(1)) = "string" Then
                 exceptionmsg("Failed to define variable.", "d_0001")
@@ -934,11 +1008,11 @@ Public Class VppInterpreter
                             exceptionmsg("Failed to define variable.", "d_0001")
                         End Try
                     End If
-                ElseIf stringval(3) = "int" Then
+                ElseIf stringval(3) = "number" Then
                     If stringval(4) = "=" Then
                         Try
                             log("[" + DateTime.Now.ToString + "]: Value defined (string). vname: " + Chr(34) + stringval(1) + Chr(34) + ",vval: " + Chr(34) + tmpval + Chr(34))
-                            objects.Add(stringval(1), New DefineObject("int", stringval(5)))
+                            objects.Add(stringval(1), New DefineObject("number", stringval(5)))
                         Catch ex As Exception
                             exceptionmsg("Failed to define variable.", "d_0001")
                         End Try
@@ -998,10 +1072,8 @@ Public Class VppInterpreter
                 canexec = False
                 MsgBox(vppstring_to_string(parameters(1)))
                 canexec = True
-            ElseIf parameters(0) = "0x0009" Then
-                Console.OpenStandardOutput()
             ElseIf parameters(0) = "0x000A" Then
-                If gettypefromval(parameters(1)) = "int" Then
+                If gettypefromval(parameters(1)) = "number" Then
                     Console.ForegroundColor = Convert.ToDecimal(parameters(1))
                 Else
                     If objects.ContainsKey(parameters(1)) Then
@@ -1009,7 +1081,7 @@ Public Class VppInterpreter
                     End If
                 End If
             ElseIf parameters(0) = "0x000B" Then
-                If gettypefromval(parameters(1)) = "int" Then
+                If gettypefromval(parameters(1)) = "number" Then
                     Console.BackgroundColor = Convert.ToDecimal(parameters(1))
                 Else
                     If objects.ContainsKey(parameters(1)) Then
@@ -1019,7 +1091,7 @@ Public Class VppInterpreter
             ElseIf parameters(0) = "0x000C" Then
                 Beep()
             ElseIf parameters(0) = "0x000D" Then
-                If gettypefromval(parameters(1)) = "int" Then
+                If gettypefromval(parameters(1)) = "number" Then
                     ip = Convert.ToDecimal(parameters(1))
                 Else
                     If objects.ContainsKey(parameters(1)) Then
@@ -1214,6 +1286,150 @@ Public Class VppInterpreter
                         command(vppstring_to_string(parameters(1)))
                     End If
                 End If
+            ElseIf parameters(0) = "0x0050" Then
+                canexec = False
+                If objects.ContainsKey(parameters(1)) Then
+                    tmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                Else
+                    tmpval1 = Convert.ToDecimal(vppstring_to_string(parameters(1)))
+                End If
+                If objects.ContainsKey(parameters(2)) Then
+                    tmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(2))).value))
+                Else
+                    tmpval2 = Convert.ToDecimal(vppstring_to_string(parameters(2)))
+                End If
+                If objects.ContainsKey(parameters(3)) Then
+                    tmpval3 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
+                Else
+                    tmpval3 = vppstring_to_string(parameters(3))
+                End If
+                If config("vppi_allow_gui") Then
+                    guiwindow = New WindowUIManager(New Drawing.Size(tmpval1, tmpval2), tmpval3)
+                End If
+                canexec = True
+            ElseIf parameters(0) = "0x0051" Then
+                'Coordinates
+                If objects.ContainsKey(parameters(1)) Then
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                Else
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(parameters(1)))
+                End If
+                If objects.ContainsKey(parameters(2)) Then
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(2))).value))
+                Else
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(parameters(2)))
+                End If
+                If objects.ContainsKey(parameters(3)) Then
+                    atmpval3 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(3))).value))
+                Else
+                    atmpval3 = Convert.ToDecimal(vppstring_to_string(parameters(3)))
+                End If
+                If objects.ContainsKey(parameters(4)) Then
+                    atmpval4 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(4))).value))
+                Else
+                    atmpval4 = Convert.ToDecimal(vppstring_to_string(parameters(4)))
+                End If
+
+                'Color
+                If objects.ContainsKey(parameters(5)) Then
+                    atmpval5 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(5))).value))
+                Else
+                    atmpval5 = Convert.ToDecimal(vppstring_to_string(parameters(5)))
+                End If
+                If objects.ContainsKey(parameters(6)) Then
+                    atmpval6 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(6))).value))
+                Else
+                    atmpval6 = Convert.ToDecimal(vppstring_to_string(parameters(6)))
+                End If
+                If objects.ContainsKey(parameters(7)) Then
+                    atmpval7 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(7))).value))
+                Else
+                    atmpval7 = Convert.ToDecimal(vppstring_to_string(parameters(7)))
+                End If
+
+                If objects.ContainsKey(parameters(8)) Then
+                    atmpval8 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(8))).value))
+                Else
+                    atmpval8 = Convert.ToDecimal(vppstring_to_string(parameters(8)))
+                End If
+
+                If guiwindow IsNot Nothing Then
+                    guiwindow.drawline(atmpval1, atmpval2, atmpval3, atmpval4, Drawing.Color.FromArgb(255, atmpval5, atmpval6, atmpval7), atmpval8)
+                End If
+            ElseIf parameters(0) = "0x0052" Then
+                'Color
+                If objects.ContainsKey(parameters(1)) Then
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                Else
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(parameters(1)))
+                End If
+                If objects.ContainsKey(parameters(2)) Then
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(2))).value))
+                Else
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(parameters(2)))
+                End If
+                If objects.ContainsKey(parameters(3)) Then
+                    atmpval3 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(3))).value))
+                Else
+                    atmpval3 = Convert.ToDecimal(vppstring_to_string(parameters(3)))
+                End If
+
+                If guiwindow IsNot Nothing Then
+                    guiwindow.clear(Drawing.Color.FromArgb(255, atmpval1, atmpval2, atmpval3))
+                End If
+
+            ElseIf parameters(0) = "0x0053" Then
+                'Coordinates
+                If objects.ContainsKey(parameters(1)) Then
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                Else
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(parameters(1)))
+                End If
+                If objects.ContainsKey(parameters(2)) Then
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(2))).value))
+                Else
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(parameters(2)))
+                End If
+
+                If objects.ContainsKey(parameters(3)) Then
+                    atmpval3 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
+                Else
+                    atmpval3 = vppstring_to_string(parameters(3))
+                End If
+
+                If objects.ContainsKey(parameters(4)) Then
+                    atmpval3 = vppstring_to_string(objects(vppstring_to_string(parameters(4))).value)
+                Else
+                    atmpval3 = vppstring_to_string(parameters(4))
+                End If
+
+                'Color
+                If objects.ContainsKey(parameters(5)) Then
+                    atmpval5 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(5))).value))
+                Else
+                    atmpval5 = Convert.ToDecimal(vppstring_to_string(parameters(5)))
+                End If
+                If objects.ContainsKey(parameters(6)) Then
+                    atmpval6 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(6))).value))
+                Else
+                    atmpval6 = Convert.ToDecimal(vppstring_to_string(parameters(6)))
+                End If
+                If objects.ContainsKey(parameters(7)) Then
+                    atmpval7 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(7))).value))
+                Else
+                    atmpval7 = Convert.ToDecimal(vppstring_to_string(parameters(7)))
+                End If
+
+                If objects.ContainsKey(parameters(8)) Then
+                    atmpval8 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(8))).value))
+                Else
+                    atmpval8 = Convert.ToDecimal(vppstring_to_string(parameters(8)))
+                End If
+
+                If guiwindow IsNot Nothing Then
+                    guiwindow.drawtext(atmpval1, atmpval2, Drawing.Color.FromArgb(255, atmpval5, atmpval6, atmpval7), atmpval8, atmpval4, atmpval3)
+                End If
+
             Else
                 exceptionmsg("Invalid parameters given: " + Chr(34) + parameters(0) + Chr(34), "c_0001")
             End If
@@ -1226,6 +1442,16 @@ Public Class VppInterpreter
             canexec = True
         End Try
     End Sub
+
+    Function filechoosedialog(parameters As String())
+        Dim fod1 As New OpenFileDialog
+        fod1.Multiselect = False
+        fod1.Title = "V++ Interpreter - Open a file"
+        fod1.Filter = vppstring_to_string(parameters(2))
+        If fod1.ShowDialog() = DialogResult.OK Then
+            Return fod1.FileName
+        End If
+    End Function
 
     Public Function getvalue(name As String)
         Try
@@ -1372,25 +1598,25 @@ Public Class VppInterpreter
         ElseIf value.value = "false" Then
             Return "bool"
         ElseIf value.value.Remove(1) = "0" Then
-            Return "int"
+            Return "number"
         ElseIf value.value.Remove(1) = "1" Then
-            Return "int"
+            Return "number"
         ElseIf value.value.Remove(1) = "2" Then
-            Return "int"
+            Return "number"
         ElseIf value.value.Remove(1) = "3" Then
-            Return "int"
+            Return "number"
         ElseIf value.value.Remove(1) = "4" Then
-            Return "int"
+            Return "number"
         ElseIf value.value.Remove(1) = "5" Then
-            Return "int"
+            Return "number"
         ElseIf value.value.Remove(1) = "6" Then
-            Return "int"
+            Return "number"
         ElseIf value.value.Remove(1) = "7" Then
-            Return "int"
+            Return "number"
         ElseIf value.value.Remove(1) = "8" Then
-            Return "int"
+            Return "number"
         ElseIf value.value.Remove(1) = "9" Then
-            Return "int"
+            Return "number"
         ElseIf value.value = "null" Then
             Return "null"
         ElseIf value.value = "null" Then
@@ -1401,6 +1627,7 @@ Public Class VppInterpreter
     End Function
 
     Function gettypefromval(value As String)
+
         If value.Contains(Chr(34)) Then
             Return "string"
         ElseIf value = "true" Then
@@ -1408,47 +1635,52 @@ Public Class VppInterpreter
         ElseIf value = "false" Then
             Return "bool"
         ElseIf value = "0" Then
-            Return "int"
+            Return "number"
         ElseIf value = "1" Then
-            Return "int"
+            Return "number"
         ElseIf value = "2" Then
-            Return "int"
+            Return "number"
         ElseIf value = "3" Then
-            Return "int"
+            Return "number"
         ElseIf value = "4" Then
-            Return "int"
+            Return "number"
         ElseIf value = "5" Then
-            Return "int"
+            Return "number"
         ElseIf value = "6" Then
-            Return "int"
+            Return "number"
         ElseIf value = "7" Then
-            Return "int"
+            Return "number"
         ElseIf value = "8" Then
-            Return "int"
+            Return "number"
         ElseIf value = "9" Then
-            Return "int"
-        ElseIf value.Remove(1) = "0" Then
-            Return "int"
-        ElseIf value.Remove(1) = "1" Then
-            Return "int"
-        ElseIf value.Remove(1) = "2" Then
-            Return "int"
-        ElseIf value.Remove(1) = "3" Then
-            Return "int"
-        ElseIf value.Remove(1) = "4" Then
-            Return "int"
-        ElseIf value.Remove(1) = "5" Then
-            Return "int"
-        ElseIf value.Remove(1) = "6" Then
-            Return "int"
-        ElseIf value.Remove(1) = "7" Then
-            Return "int"
-        ElseIf value.Remove(1) = "8" Then
-            Return "int"
-        ElseIf value.Remove(1) = "9" Then
-            Return "int"
-        ElseIf value = "null" Then
-            Return "null"
+            Return "number"
+        End If
+        If value.Length > 1 Then
+            If value.Remove(1) = "0" Then
+                Return "number"
+            ElseIf value.Remove(1) = "1" Then
+                Return "number"
+            ElseIf value.Remove(1) = "2" Then
+                Return "number"
+            ElseIf value.Remove(1) = "3" Then
+                Return "number"
+            ElseIf value.Remove(1) = "4" Then
+                Return "number"
+            ElseIf value.Remove(1) = "5" Then
+                Return "number"
+            ElseIf value.Remove(1) = "6" Then
+                Return "number"
+            ElseIf value.Remove(1) = "7" Then
+                Return "number"
+            ElseIf value.Remove(1) = "8" Then
+                Return "number"
+            ElseIf value.Remove(1) = "9" Then
+                Return "number"
+            ElseIf value = "null" Then
+                Return "null"
+            Else
+                Return Nothing
+            End If
         Else
             Return Nothing
         End If
@@ -1470,6 +1702,28 @@ Public Class VppInterpreter
                     End If
                 Else
 
+                End If
+            ElseIf i = "@" Then
+                If tmpval = "\\" Then
+                    If modify = False Then
+                        vpps_tmpval = vpps_tmpval + "\\@"
+                    ElseIf modify = True Then
+                        vpps_tmpval = vpps_tmpval + scriptdir
+                        tmpval = ""
+                    End If
+                Else
+                    vpps_tmpval = vpps_tmpval + "\\@"
+                End If
+            ElseIf i = "r" Then
+                If tmpval = "\\" Then
+                    If modify = False Then
+                        vpps_tmpval = vpps_tmpval + "\\r"
+                    ElseIf modify = True Then
+                        vpps_tmpval = vpps_tmpval + New Random().Next(0, 99999999).ToString()
+                        tmpval = ""
+                    End If
+                Else
+                    vpps_tmpval = vpps_tmpval + "\\r"
                 End If
             ElseIf i = "\" Then
                 If modify = False Then
@@ -1556,7 +1810,9 @@ Public Class VppInterpreter
 
     Sub invokeevent(eventname, args)
         If cf = nf Then
-            callstack.Push(New CallStackObject(ip, cf, threadname + " :: " + cf))
+            If usecallstack Then
+                callstack.Push(New CallStackObject(ip, cf, threadname + " :: " + cf))
+            End If
         End If
         execfunc(eventhandlers(eventname), args)
     End Sub

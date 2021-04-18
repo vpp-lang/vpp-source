@@ -8,6 +8,9 @@ Module Module1
     Dim prerelease = False
     Dim versubfix = ""
 
+    Dim ts_nowarning = False
+    Dim ts_fname = ""
+
     Sub Main()
         If prerelease Then
             Console.Title = "[Prelease] V++ Interpreter"
@@ -28,25 +31,45 @@ Module Module1
                 Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString + versubfix)
                 Console.WriteLine("Made by VMGP Official (2016-2021)")
             ElseIf args(0) = "-?" Then
-                Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString + versubfix)
-                Console.WriteLine()
-                Console.WriteLine("Uses:")
-                Console.WriteLine("vppi -?  vppi --help : Help.")
-                Console.WriteLine("vppi -v  vppi --version : Show vppi version.")
-                Console.WriteLine("vppi [FILE] : Start intepreting a script.")
+                helpcmd()
             ElseIf args(0) = "--help" Then
-                Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString + versubfix)
-                Console.WriteLine()
-                Console.WriteLine("Uses:")
-                Console.WriteLine("vppi -?  vppi --help : Help.")
-                Console.WriteLine("vppi -v  vppi --version : Show vppi version.")
-                Console.WriteLine("vppi [FILE] : Start intepreting a script.")
+                helpcmd()
             End If
+        ElseIf argc > 1 Then
+            For Each i As String In args
+                If File.Exists(i) Then
+                    newinterpreter(i)
+                ElseIf i = "--nowarn" Then
+                    ts_nowarning = True
+                ElseIf i = "-W" Then
+                    ts_nowarning = True
+                End If
+            Next
+        Else
+            Console.WriteLine("Please specify a script to run. Run with the ""--help"" argument to see all commands.")
         End If
+    End Sub
+
+    Sub helpcmd()
+        Console.WriteLine("V++ Intepreter (vppi) v" + My.Application.Info.Version.ToString + versubfix)
+        Console.WriteLine()
+        Console.WriteLine("Basic commands:")
+        Console.WriteLine("-? : Help.")
+        Console.WriteLine("--help : Help.")
+        Console.WriteLine("-v : Show vppi version.")
+        Console.WriteLine("--version  : Show vppi version.")
+        Console.WriteLine("[FILE] : Start intepreting a script.")
+        Console.WriteLine()
+        Console.WriteLine("Script commands:")
+        Console.WriteLine("--W : Disable warnings")
+        Console.WriteLine("--nowarn : Disable warnings")
+        Console.WriteLine()
+        Console.WriteLine("Example: vppi -W C:\test\test.vpp")
     End Sub
 
     Sub newinterpreter(fpath As String)
         interpreters.Add(New VppInterpreter(fpath, False, getconfig()))
+        interpreters(interpreters.Count - 1).nowarn = ts_nowarning
     End Sub
 
     Function getappdir()
@@ -95,4 +118,11 @@ Module Module1
             End
         End Try
     End Function
+
+    Sub vconsole()
+        Console.Write(">>> ")
+        Static vconsoleinput = Console.ReadLine()
+
+        vconsole()
+    End Sub
 End Module
