@@ -1,0 +1,12 @@
+C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.DepForm.resources
+C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.Form1.resources
+C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.Resources.resources
+C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.vbproj.GenerateResource.cache
+C:\Users\MATEI\source\repos\vpps\vpps\bin\Debug\vpps.exe.config
+C:\Users\MATEI\source\repos\vpps\vpps\bin\Debug\vpps.exe
+C:\Users\MATEI\source\repos\vpps\vpps\bin\Debug\vpps.pdb
+C:\Users\MATEI\source\repos\vpps\vpps\bin\Debug\vpps.xml
+C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.vbprojAssemblyReference.cache
+C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.exe
+C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.xml
+C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.pdb

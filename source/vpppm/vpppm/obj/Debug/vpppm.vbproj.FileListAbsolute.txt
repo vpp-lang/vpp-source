@@ -1,0 +1,10 @@
+C:\Users\MATEI\source\repos\vpppm\vpppm\bin\Debug\vpppm.exe.config
+C:\Users\MATEI\source\repos\vpppm\vpppm\bin\Debug\vpppm.exe
+C:\Users\MATEI\source\repos\vpppm\vpppm\bin\Debug\vpppm.pdb
+C:\Users\MATEI\source\repos\vpppm\vpppm\bin\Debug\vpppm.xml
+C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.vbprojAssemblyReference.cache
+C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.Resources.resources
+C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.vbproj.GenerateResource.cache
+C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.exe
+C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.xml
+C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.pdb
