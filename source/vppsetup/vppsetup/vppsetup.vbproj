@@ -132,8 +132,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="newvpplogo.ico" />
-    <None Include="Resources\vpppm.exe" />
     <None Include="Resources\vpps.exe" />
+    <None Include="Resources\vpppm.exe" />
     <None Include="Resources\vppi.exe" />
     <None Include="Resources\_7zr.exe" />
     <None Include="Resources\vppicon.png" />

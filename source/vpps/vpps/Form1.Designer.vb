@@ -199,12 +199,13 @@ Partial Class Form1
         Me.CUFCB.TabIndex = 5
         Me.CUFCB.Text = "CheckBox1"
         Me.CUFCB.UseVisualStyleBackColor = True
+        Me.CUFCB.Visible = False
         '
         'PrereleaseDownload
         '
         Me.PrereleaseDownload.AutoSize = True
         Me.PrereleaseDownload.Enabled = False
-        Me.PrereleaseDownload.Location = New System.Drawing.Point(12, 305)
+        Me.PrereleaseDownload.Location = New System.Drawing.Point(12, 81)
         Me.PrereleaseDownload.Name = "PrereleaseDownload"
         Me.PrereleaseDownload.Size = New System.Drawing.Size(221, 17)
         Me.PrereleaseDownload.TabIndex = 4
@@ -291,7 +292,7 @@ Partial Class Form1
         'Timer1
         '
         Me.Timer1.Enabled = True
-        Me.Timer1.Interval = 360000
+        Me.Timer1.Interval = 300000
         '
         'Form1
         '

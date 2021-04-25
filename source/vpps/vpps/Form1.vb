@@ -5,7 +5,7 @@ Imports System.Net
 Public Class Form1
     Public logfile As StreamWriter
     Public prerelease = False
-    Public versub = ""
+    Public versub = "-hf1"
 
     Public egnum = 0
 
@@ -120,9 +120,7 @@ Public Class Form1
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        If CUFCB.Checked Then
-            checkfu()
-        End If
+        checkfu()
     End Sub
 
     Sub easteregg1()
