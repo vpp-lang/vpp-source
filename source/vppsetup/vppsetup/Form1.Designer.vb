@@ -35,6 +35,7 @@ Partial Class Form1
         Me.WelcomePageLabel2 = New System.Windows.Forms.Label()
         Me.WelcomePageLabel1 = New System.Windows.Forms.Label()
         Me.InstallationPage = New System.Windows.Forms.TabPage()
+        Me.InstallationPageChk4 = New System.Windows.Forms.CheckBox()
         Me.LegacyPath = New System.Windows.Forms.CheckBox()
         Me.InstallationPageChk3 = New System.Windows.Forms.CheckBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -142,7 +143,7 @@ Partial Class Form1
         Me.VAICombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.VAICombo.FormattingEnabled = True
         Me.VAICombo.Items.AddRange(New Object() {"Update", "Uninstall"})
-        Me.VAICombo.Location = New System.Drawing.Point(213, 91)
+        Me.VAICombo.Location = New System.Drawing.Point(213, 90)
         Me.VAICombo.Name = "VAICombo"
         Me.VAICombo.Size = New System.Drawing.Size(312, 21)
         Me.VAICombo.TabIndex = 3
@@ -169,6 +170,7 @@ Partial Class Form1
         '
         'InstallationPage
         '
+        Me.InstallationPage.Controls.Add(Me.InstallationPageChk4)
         Me.InstallationPage.Controls.Add(Me.LegacyPath)
         Me.InstallationPage.Controls.Add(Me.InstallationPageChk3)
         Me.InstallationPage.Controls.Add(Me.Label1)
@@ -184,11 +186,21 @@ Partial Class Form1
         Me.InstallationPage.Text = "Collecting data"
         Me.InstallationPage.UseVisualStyleBackColor = True
         '
+        'InstallationPageChk4
+        '
+        Me.InstallationPageChk4.AutoSize = True
+        Me.InstallationPageChk4.Location = New System.Drawing.Point(12, 137)
+        Me.InstallationPageChk4.Name = "InstallationPageChk4"
+        Me.InstallationPageChk4.Size = New System.Drawing.Size(116, 17)
+        Me.InstallationPageChk4.TabIndex = 9
+        Me.InstallationPageChk4.Text = "Associate file types"
+        Me.InstallationPageChk4.UseVisualStyleBackColor = True
+        '
         'LegacyPath
         '
         Me.LegacyPath.AutoSize = True
         Me.LegacyPath.Enabled = False
-        Me.LegacyPath.Location = New System.Drawing.Point(12, 137)
+        Me.LegacyPath.Location = New System.Drawing.Point(12, 160)
         Me.LegacyPath.Name = "LegacyPath"
         Me.LegacyPath.Size = New System.Drawing.Size(137, 17)
         Me.LegacyPath.TabIndex = 8
@@ -295,7 +307,7 @@ Partial Class Form1
         '
         'Panel1
         '
-        Me.Panel1.BackColor = System.Drawing.Color.SteelBlue
+        Me.Panel1.BackColor = System.Drawing.Color.CadetBlue
         Me.Panel1.Controls.Add(Me.PictureBox2)
         Me.Panel1.Location = New System.Drawing.Point(3, 3)
         Me.Panel1.Name = "Panel1"
@@ -368,4 +380,5 @@ Partial Class Form1
     Friend WithEvents InstallationPage As TabPage
     Friend WithEvents LegacyPath As CheckBox
     Friend WithEvents PictureBox2 As PictureBox
+    Friend WithEvents InstallationPageChk4 As CheckBox
 End Class

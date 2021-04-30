@@ -9,7 +9,7 @@ Public Class Form1
     Dim cargs As List(Of String)
     Dim state = 0
     Dim vai = False
-    Dim versub = "-hf1"
+    Dim versub = ""
     Dim prerelease = False
 
     Dim pathseparator = Path.DirectorySeparatorChar
@@ -134,6 +134,7 @@ Public Class Form1
                 InstallationPageChk1.Checked = True
                 InstallationPageChk2.Checked = True
                 InstallationPageChk3.Checked = True
+                InstallationPageChk4.Checked = True
                 If My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\vpp", "DisplayName", Nothing) = Nothing Then
                     InstallationPage.Enabled = False
                     ProgressPage.Enabled = False
@@ -150,6 +151,10 @@ Public Class Form1
                 End If
             End If
         Else
+            InstallationPageChk1.Checked = True
+            InstallationPageChk2.Checked = True
+            InstallationPageChk3.Checked = True
+            InstallationPageChk4.Checked = True
             If My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\vpp", "DisplayName", Nothing) = Nothing Then
                 InstallationPage.Enabled = False
                 ProgressPage.Enabled = False
@@ -212,6 +217,15 @@ Public Class Form1
     End Function
 
     Sub installvpp()
+        For Each p As Process In Process.GetProcessesByName("vppi")
+            p.Kill()
+        Next
+        For Each p As Process In Process.GetProcessesByName("vpps")
+            p.Kill()
+        Next
+        For Each p As Process In Process.GetProcessesByName("vpppm")
+            p.Kill()
+        Next
         If state = 2 Then
             If My.Application.Info.DirectoryPath = getpff() Then
                 If File.Exists(getappdir() + pathseparator + "tmp_vppsetup.exe") Then
@@ -221,7 +235,7 @@ Public Class Form1
                 Process.Start(getappdir() + pathseparator + "tmp_vppsetup.exe", "-uninstall")
                 End
             End If
-                If MsgBox("Are you sure you want to uninstall V++?", MsgBoxStyle.YesNo, "V++ Setup") = MsgBoxResult.No Then
+            If MsgBox("Are you sure you want to uninstall V++?", MsgBoxStyle.YesNo, "V++ Setup") = MsgBoxResult.No Then
                 End
             End If
             ProgressPageTitle.Text = "Uninstalling"
@@ -247,7 +261,19 @@ Public Class Form1
             If My.Computer.Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Uninstall\vpp") IsNot Nothing Then
                 My.Computer.Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Uninstall", True).DeleteSubKey("vpp")
             End If
-            My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\Run", True).DeleteValue("V++ Settings")
+            If My.Computer.Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Uninstall\vpp") IsNot Nothing Then
+                My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\Run", True).DeleteValue("V++ Settings")
+            End If
+            If My.Computer.Registry.ClassesRoot.OpenSubKey(".vpp") IsNot Nothing Then
+                My.Computer.Registry.ClassesRoot.DeleteSubKey(".vpp")
+            End If
+            If My.Computer.Registry.ClassesRoot.OpenSubKey("V++ Script\shell\open\command") IsNot Nothing Then
+                My.Computer.Registry.ClassesRoot.DeleteSubKey("V++ Script\shell\open\command")
+            End If
+
+            If Environment.GetEnvironmentVariable("PATH").Contains(";" + getpff()) Then
+                Environment.GetEnvironmentVariable("PATH").Replace(";" + getpff(), "")
+            End If
             If Environment.GetEnvironmentVariable("PATH").Contains(getpff() + ";") Then
                 Environment.GetEnvironmentVariable("PATH").Replace(getpff() + ";", "")
             End If
@@ -267,12 +293,6 @@ Public Class Form1
                 ProgressPageTitle.Text = "Installing"
                 Threading.Thread.Sleep(5000)
                 ProgressPageText.Text = "Terminating all V++ sessions..."
-                For Each p As Process In Process.GetProcessesByName("vppi")
-                    p.Kill()
-                Next
-                For Each p As Process In Process.GetProcessesByName("vpps")
-                    p.Kill()
-                Next
                 ProgressPagePB.Style = ProgressBarStyle.Blocks
                 ProgressPagePB.Value = 1
                 'Sets registry up
@@ -318,13 +338,19 @@ Public Class Form1
                     My.Computer.Registry.SetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\vpp", "DisplayIcon", getpff() + "\vppi.exe", Microsoft.Win32.RegistryValueKind.String)
                 End If
                 My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\Run", True).SetValue("V++ Settings", """" + getpff() + pathseparator + "vpps.exe" + """ -i")
+
+                If InstallationPageChk4.Checked = True Then
+                    My.Computer.Registry.ClassesRoot.CreateSubKey(".vpp").SetValue("", "V++ Script", Microsoft.Win32.RegistryValueKind.String)
+                    My.Computer.Registry.ClassesRoot.CreateSubKey("V++ Script\shell\open\command").SetValue("", getpff() + pathseparator + "vppi.exe ""%l"" ", Microsoft.Win32.RegistryValueKind.String)
+                End If
+
                 ProgressPagePB.Value = 90
                 ProgressPageText.Text = "Configuring V++..."
-                Dim vpppmi As Process = Process.Start(getpff() + pathseparator + "vpppm.exe", "-R")
+                Dim vpppmi As Process = Process.Start(getpff() + pathseparator + "vpppm.exe", "-r")
                 vpppmi.WaitForExit()
                 ProgressPagePB.Value = 92
                 If InstallationPageChk1.CheckState = CheckState.Checked Then
-                    Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") + getpff() + ";", EnvironmentVariableTarget.Machine)
+                    Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") + ";" + getpff(), EnvironmentVariableTarget.Machine)
                 End If
                 If InstallationPageChk2.CheckState = CheckState.Checked Then
                     CreateShortcut(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu) + "\V++ Settings.lnk", getpff() + "\vpps.exe")
@@ -374,6 +400,10 @@ Public Class Form1
 
     Private Sub CancelBtn_Click(sender As Object, e As EventArgs) Handles CancelBtn.Click
         End
+    End Sub
+
+    Sub associateft()
+
     End Sub
 
     Private Sub LegacyPath_CheckedChanged(sender As Object, e As EventArgs) Handles LegacyPath.CheckedChanged

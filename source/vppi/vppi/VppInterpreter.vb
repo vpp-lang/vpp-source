@@ -1728,7 +1728,7 @@ Public Class VppInterpreter
                         tmpval = ""
                     End If
                 Else
-                    vpps_tmpval = vpps_tmpval + "\\@"
+                    vpps_tmpval = vpps_tmpval + i
                 End If
             ElseIf i = "r" Then
                 If tmpval = "\\" Then
@@ -1739,7 +1739,7 @@ Public Class VppInterpreter
                         tmpval = ""
                     End If
                 Else
-                    vpps_tmpval = vpps_tmpval + "\\r"
+                    vpps_tmpval = vpps_tmpval + i
                 End If
             ElseIf i = "\" Then
                 If modify = False Then
@@ -1750,7 +1750,7 @@ Public Class VppInterpreter
                     ElseIf tmpval = "\" Then
                         tmpval = "\\"
                     ElseIf tmpval = "\\" Then
-                        vpps_tmpval = vpps_tmpval + "\"
+                        vpps_tmpval = vpps_tmpval + i
                     End If
                 End If
             Else

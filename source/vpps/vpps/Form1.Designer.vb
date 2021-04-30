@@ -87,7 +87,7 @@ Partial Class Form1
         '
         Me.GroupBox3.Controls.Add(Me.Label4)
         Me.GroupBox3.Controls.Add(Me.RecfgBtn)
-        Me.GroupBox3.Location = New System.Drawing.Point(9, 169)
+        Me.GroupBox3.Location = New System.Drawing.Point(9, 168)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(467, 77)
         Me.GroupBox3.TabIndex = 2
@@ -254,7 +254,7 @@ Partial Class Form1
         '
         'NotifyIcon1
         '
-        Me.NotifyIcon1.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info
+        Me.NotifyIcon1.ContextMenuStrip = Me.ContextMenuStrip1
         Me.NotifyIcon1.Icon = CType(resources.GetObject("NotifyIcon1.Icon"), System.Drawing.Icon)
         Me.NotifyIcon1.Text = "V++ Settings"
         Me.NotifyIcon1.Visible = True

@@ -5,9 +5,10 @@ Imports System.Net
 Public Class Form1
     Public logfile As StreamWriter
     Public prerelease = False
-    Public versub = "-hf1"
+    Public versub = ""
 
     Public egnum = 0
+    Public pendingup = False
 
     Private Sub LogButton_Click(sender As Object, e As EventArgs) Handles LogButton.Click
         startproc("explorer.exe", getappdir(), False)
@@ -28,29 +29,37 @@ Public Class Form1
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        checkfu()
+        If pendingup = True Then
+            installupdate()
+        Else
+            checkfu()
+        End If
     End Sub
 
     Sub checkfu()
         Try
             Me.UseWaitCursor = True
             UpdateStatusLabel.Text = "Checking for updates..."
+            Button1.Enabled = False
             Dim nextver = webrequest("http://vpp-lang.github.io/website/sv.txt")
             If nextver = My.Application.Info.Version.ToString() + versub Then
-                UpdateStatusLabel.Text = "Latest version installed."
+                UpdateStatusLabel.Text = "Latest version installed. Last checked on " + DateString + " " + TimeString
                 Me.UseWaitCursor = False
+                Button1.Enabled = True
             Else
+                pendingup = True
+                UpdateStatusLabel.Text = "Downloading update..."
                 downloadsetup()
-                UpdateStatusLabel.Text = "Preparing to install update..."
+                NotifyIcon1.ShowBalloonTip(1000, "V++ Settings", "An update is available." + vbNewLine + "Update version: " + nextver + vbNewLine + "Update notes: " + webrequest("http://vpp-lang.github.io/website/sn.txt"), ToolTipIcon.None)
                 Me.UseWaitCursor = False
-                If MsgBox("An update is available. Click the ok button to install the update." + vbNewLine + vbNewLine + "Update version: " + nextver + vbNewLine + "Update notes:" + vbNewLine + webrequest("http://vpp-lang.github.io/website/sn.txt")) = MsgBoxResult.Ok Then
-                    installupdate()
-                End If
+                Button1.Text = "Install update"
+                Button1.Enabled = True
+                UpdateStatusLabel.Text = "Click the button to install the update!"
             End If
         Catch ex As Exception
             Me.UseWaitCursor = False
             UpdateStatusLabel.Text = "Failed to check for updates!"
-            MsgBox("Failed to check for updates. " + vbNewLine + vbNewLine + "Debug info: " + vbNewLine + "Error message and error code: " + ex.Message + " [" + ex.HResult.ToString + "]" + vbNewLine + "Error source: " + ex.Source + vbNewLine, MsgBoxStyle.Critical, Me.Text)
+            'MsgBox("Failed to check for updates. " + vbNewLine + vbNewLine + "Debug info: " + vbNewLine + "Error message and error code: " + ex.Message + " [" + ex.HResult.ToString + "]" + vbNewLine + "Error source: " + ex.Source + vbNewLine, MsgBoxStyle.Critical, Me.Text)
         End Try
     End Sub
 
@@ -65,10 +74,16 @@ Public Class Form1
     End Sub
 
     Sub installupdate()
-        If File.Exists(fixpath(getappdir() + "\vppsetup_latest.exe")) Then
-            startproc(fixpath(getappdir() + "\vppsetup_latest.exe"), "-update", True)
-            End
-        End If
+        Try
+            If File.Exists(fixpath(getappdir() + "\vppsetup_latest.exe")) Then
+                startproc(fixpath(getappdir() + "\vppsetup_latest.exe"), "-update", True)
+                End
+            End If
+        Catch ex As Exception
+            Me.UseWaitCursor = False
+            UpdateStatusLabel.Text = "Failed to check for updates!"
+            MsgBox("Failed to install update. " + vbNewLine + vbNewLine + "Debug info: " + vbNewLine + "Error message and error code: " + ex.Message + " [" + ex.HResult.ToString + "]" + vbNewLine + "Error source: " + ex.Source + vbNewLine, MsgBoxStyle.Critical, Me.Text)
+        End Try
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
@@ -80,8 +95,7 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        NM_Ver.Text = "V++ Settings " + My.Application.Info.Version.ToString
-        NotifyIcon1.ContextMenuStrip = ContextMenuStrip1
+        NM_Ver.Text = "V++ Settings " + My.Application.Info.Version.ToString + versub
         If prerelease = True Then
             Me.Text = "[Prerelease] V++ Settings"
             PrereleaseDownload.Checked = True
@@ -106,6 +120,7 @@ Public Class Form1
     Private Sub NotifyIcon1_MouseClick(sender As Object, e As MouseEventArgs) Handles NotifyIcon1.MouseClick
         If e.Button = MouseButtons.Left Then
             Me.Visible = True
+            Me.Focus()
         ElseIf e.Button = MouseButtons.Middle Then
             easteregg1()
         End If
@@ -120,27 +135,13 @@ Public Class Form1
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        checkfu()
+        If pendingup = False Then
+            checkfu()
+        End If
     End Sub
 
     Sub easteregg1()
-        If egnum = 0 Then
-            MsgBox("But why would you do this?", MsgBoxStyle.Question, "WHYYYYYYYYYY?")
-        ElseIf egnum = 1 Then
-            MsgBox("Why?", MsgBoxStyle.Question, "WHYYYYYYYYYY?")
-        ElseIf egnum = 2 Then
-            MsgBox("Stop", MsgBoxStyle.Exclamation, "Please")
-        ElseIf egnum = 3 Then
-            MsgBox("Stop", MsgBoxStyle.Exclamation, "Please")
-        ElseIf egnum = 4 Then
-            MsgBox("STOP IT!", MsgBoxStyle.Critical, "STOP")
-        ElseIf egnum = 5 Then
-            MsgBox("If you do it once more i will restart your pc.", MsgBoxStyle.Critical, "STOP")
-        ElseIf egnum = 6 Then
-            MsgBox("Goodbye.", MsgBoxStyle.Information, " ")
-            Process.Start("shutdown", "-r -t 0")
-        End If
-        egnum += 1
+
     End Sub
 
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
@@ -151,9 +152,5 @@ Public Class Form1
         Catch ex As Exception
 
         End Try
-    End Sub
-
-    Private Sub TabPage1_Click(sender As Object, e As EventArgs) Handles TabPage1.Click
-
     End Sub
 End Class
