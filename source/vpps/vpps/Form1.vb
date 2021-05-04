@@ -5,7 +5,7 @@ Imports System.Net
 Public Class Form1
     Public logfile As StreamWriter
     Public prerelease = False
-    Public versub = ""
+    Public versub = "-hf1"
 
     Public egnum = 0
     Public pendingup = False
@@ -109,7 +109,7 @@ Public Class Form1
     End Function
 
     Private Sub RecfgBtn_Click(sender As Object, e As EventArgs) Handles RecfgBtn.Click
-        Process.Start("vpppm", "-R")
+        Process.Start(My.Application.Info.DirectoryPath + "vpppm.exe", "-R")
     End Sub
 
     Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing

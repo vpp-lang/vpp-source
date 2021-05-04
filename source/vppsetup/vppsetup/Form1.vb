@@ -9,7 +9,7 @@ Public Class Form1
     Dim cargs As List(Of String)
     Dim state = 0
     Dim vai = False
-    Dim versub = ""
+    Dim versub = "-hf1"
     Dim prerelease = False
 
     Dim pathseparator = Path.DirectorySeparatorChar
@@ -110,6 +110,7 @@ Public Class Form1
         checkforcompat()
         If cargl = 1 Then
             If cargs(0) = "-update" Then
+                InstallationPageChk4.Checked = True
                 cpage = 2
                 state = 1
                 If Environment.GetEnvironmentVariable("PATH").Contains(getpff()) = False Then
