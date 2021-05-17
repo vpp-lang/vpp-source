@@ -51,7 +51,12 @@ Module Module1
                 End If
             Next
         Else
+            Console.WriteLine("V++ Console")
+            Console.WriteLine()
             Console.WriteLine("Please specify a script to run. Run with the ""--help"" argument to see all commands.")
+            Console.WriteLine("Type ""exit"" to close the console.")
+            vconsole()
+            End
         End If
     End Sub
 
@@ -139,7 +144,16 @@ Module Module1
 
     Sub vconsole()
         Console.Write(">>> ")
-        Static vconsoleinput = Console.ReadLine()
+        Static vconsoleinput
+        vconsoleinput = Console.ReadLine()
+
+        If File.Exists(vconsoleinput) Then
+            newinterpreter(vconsoleinput)
+        ElseIf vconsoleinput = "exit" Then
+            End
+        Else
+            Console.WriteLine("Invalid file name.")
+        End If
 
         vconsole()
     End Sub

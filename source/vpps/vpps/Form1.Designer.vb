@@ -26,6 +26,12 @@ Partial Class Form1
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.DSCLink = New System.Windows.Forms.LinkLabel()
+        Me.GHILink = New System.Windows.Forms.LinkLabel()
+        Me.GHDLink = New System.Windows.Forms.LinkLabel()
+        Me.GFBtn = New System.Windows.Forms.Button()
+        Me.Label5 = New System.Windows.Forms.Label()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.RecfgBtn = New System.Windows.Forms.Button()
@@ -51,6 +57,7 @@ Partial Class Form1
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
+        Me.GroupBox4.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
@@ -72,6 +79,7 @@ Partial Class Form1
         '
         'TabPage1
         '
+        Me.TabPage1.Controls.Add(Me.GroupBox4)
         Me.TabPage1.Controls.Add(Me.GroupBox3)
         Me.TabPage1.Controls.Add(Me.GroupBox2)
         Me.TabPage1.Controls.Add(Me.GroupBox1)
@@ -82,6 +90,70 @@ Partial Class Form1
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'GroupBox4
+        '
+        Me.GroupBox4.Controls.Add(Me.DSCLink)
+        Me.GroupBox4.Controls.Add(Me.GHILink)
+        Me.GroupBox4.Controls.Add(Me.GHDLink)
+        Me.GroupBox4.Controls.Add(Me.GFBtn)
+        Me.GroupBox4.Controls.Add(Me.Label5)
+        Me.GroupBox4.Location = New System.Drawing.Point(9, 251)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(467, 92)
+        Me.GroupBox4.TabIndex = 3
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "Feedback and Issues"
+        '
+        'DSCLink
+        '
+        Me.DSCLink.AutoSize = True
+        Me.DSCLink.Location = New System.Drawing.Point(10, 47)
+        Me.DSCLink.Name = "DSCLink"
+        Me.DSCLink.Size = New System.Drawing.Size(75, 13)
+        Me.DSCLink.TabIndex = 4
+        Me.DSCLink.TabStop = True
+        Me.DSCLink.Text = "Discord server"
+        '
+        'GHILink
+        '
+        Me.GHILink.AutoSize = True
+        Me.GHILink.Location = New System.Drawing.Point(10, 73)
+        Me.GHILink.Name = "GHILink"
+        Me.GHILink.Size = New System.Drawing.Size(97, 13)
+        Me.GHILink.TabIndex = 3
+        Me.GHILink.TabStop = True
+        Me.GHILink.Text = "Github issues page"
+        '
+        'GHDLink
+        '
+        Me.GHDLink.AutoSize = True
+        Me.GHDLink.Location = New System.Drawing.Point(10, 60)
+        Me.GHDLink.Name = "GHDLink"
+        Me.GHDLink.Size = New System.Drawing.Size(117, 13)
+        Me.GHDLink.TabIndex = 2
+        Me.GHDLink.TabStop = True
+        Me.GHDLink.Text = "Github discussion page"
+        '
+        'GFBtn
+        '
+        Me.GFBtn.Location = New System.Drawing.Point(300, 63)
+        Me.GFBtn.Name = "GFBtn"
+        Me.GFBtn.Size = New System.Drawing.Size(160, 23)
+        Me.GFBtn.TabIndex = 1
+        Me.GFBtn.Text = "Give feedback"
+        Me.GFBtn.UseVisualStyleBackColor = True
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(10, 16)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(425, 26)
+        Me.Label5.TabIndex = 0
+        Me.Label5.Text = "If you find any issues and/or want to give feedback, please tell us. You can tell" &
+    " us on the" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Issues page, Discussion page, discord server or give us direct feedb" &
+    "ack."
         '
         'GroupBox3
         '
@@ -308,6 +380,8 @@ Partial Class Form1
         Me.Text = "V++ Settings"
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage1.ResumeLayout(False)
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
@@ -347,4 +421,10 @@ Partial Class Form1
     Friend WithEvents NM_Quit As ToolStripMenuItem
     Friend WithEvents Timer1 As Timer
     Friend WithEvents CUFCB As CheckBox
+    Friend WithEvents GroupBox4 As GroupBox
+    Friend WithEvents DSCLink As LinkLabel
+    Friend WithEvents GHILink As LinkLabel
+    Friend WithEvents GHDLink As LinkLabel
+    Friend WithEvents GFBtn As Button
+    Friend WithEvents Label5 As Label
 End Class

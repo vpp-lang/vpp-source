@@ -9,7 +9,7 @@ Public Class Form1
     Dim cargs As List(Of String)
     Dim state = 0
     Dim vai = False
-    Dim versub = "-hf1"
+    Dim versub = ""
     Dim prerelease = False
 
     Dim pathseparator = Path.DirectorySeparatorChar
@@ -312,25 +312,20 @@ Public Class Form1
                 My.Computer.Registry.SetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\vpp", "UninstallString", getpff() + "\vppsetup.exe -uninstall", Microsoft.Win32.RegistryValueKind.String)
                 'Extracts executables
                 ProgressPageText.Text = "Extracting executables..."
-                If File.Exists(getpff() + pathseparator + "vppi.exe") Then
-                    File.Delete(getpff() + pathseparator + "vppi.exe")
-                End If
-                File.WriteAllBytes(getpff() + pathseparator + "vppi.exe", My.Resources.vppi)
-                ProgressPagePB.Value = 25
-                If File.Exists(getpff() + pathseparator + "vpps.exe") Then
-                    File.Delete(getpff() + pathseparator + "vpps.exe")
-                End If
-                File.WriteAllBytes(getpff() + pathseparator + "vpps.exe", My.Resources.vpps)
+                '7zr
                 If File.Exists(getpff() + pathseparator + "7zr.exe") Then
                     File.Delete(getpff() + pathseparator + "7zr.exe")
                 End If
                 File.WriteAllBytes(getpff() + pathseparator + "7zr.exe", My.Resources._7zr)
-                If File.Exists(getpff() + pathseparator + "vpppm.exe") Then
-                    File.Delete(getpff() + pathseparator + "vpppm.exe")
-                End If
-                File.WriteAllBytes(getpff() + pathseparator + "vpppm.exe", My.Resources.vpppm)
-                ProgressPagePB.Value = 30
 
+                'V++ ZIP
+                If File.Exists(getappdir() + pathseparator + "vpp_inspak.zip") Then
+                    File.Delete(getappdir() + pathseparator + "vpp_inspak.zip")
+                End If
+                File.WriteAllBytes(getappdir() + pathseparator + "vpp_inspak.zip", My.Resources.vppzip)
+                unpack()
+
+                ProgressPagePB.Value = 30
                 File.Copy(Application.ExecutablePath, getpff() + pathseparator + "vppsetup.exe")
                 ProgressPagePB.Value = 40
                 ProgressPageText.Text = "Finishing installation..."
@@ -405,6 +400,20 @@ Public Class Form1
 
     Sub associateft()
 
+    End Sub
+
+    Sub unpack()
+        Dim _7zrproc As New Process()
+        _7zrproc.StartInfo.UseShellExecute = False
+        _7zrproc.StartInfo.FileName = getpff() + pathseparator + "7zr.exe"
+        _7zrproc.StartInfo.Arguments = "x """ + getappdir() + pathseparator + "vpp_inspak.zip"" -o""" + getpff() + """"
+        _7zrproc.StartInfo.CreateNoWindow = True
+        _7zrproc.StartInfo.RedirectStandardOutput = True
+        _7zrproc.StartInfo.RedirectStandardError = True
+        _7zrproc.Start()
+        _7zrproc.WaitForExit()
+        MsgBox(_7zrproc.StandardOutput.ReadToEnd())
+        MsgBox(_7zrproc.StandardError.ReadToEnd())
     End Sub
 
     Private Sub LegacyPath_CheckedChanged(sender As Object, e As EventArgs) Handles LegacyPath.CheckedChanged

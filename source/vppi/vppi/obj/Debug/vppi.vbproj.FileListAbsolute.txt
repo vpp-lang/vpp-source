@@ -8,3 +8,10 @@ C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.vbproj.GenerateResource.cac
 C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.exe
 C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.xml
 C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.pdb
+C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi_ext_http.dll
+C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi_ext_lui.dll
+C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi_ext_http.pdb
+C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi_ext_http.xml
+C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi_ext_lui.pdb
+C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi_ext_lui.xml
+C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.vbproj.CopyComplete

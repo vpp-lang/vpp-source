@@ -47,20 +47,16 @@ Partial Class Form1
         Me.ProgressPageText = New System.Windows.Forms.Label()
         Me.ProgressPagePB = New System.Windows.Forms.ProgressBar()
         Me.ProgressPageTitle = New System.Windows.Forms.Label()
-        Me.Panel1 = New System.Windows.Forms.Panel()
-        Me.PictureBox2 = New System.Windows.Forms.PictureBox()
         Me.MainPanel.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.WelcomePage.SuspendLayout()
         Me.InstallationPage.SuspendLayout()
         Me.ProgressPage.SuspendLayout()
-        Me.Panel1.SuspendLayout()
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'CancelBtn
         '
-        Me.CancelBtn.Location = New System.Drawing.Point(609, 469)
+        Me.CancelBtn.Location = New System.Drawing.Point(539, 472)
         Me.CancelBtn.Name = "CancelBtn"
         Me.CancelBtn.Size = New System.Drawing.Size(75, 23)
         Me.CancelBtn.TabIndex = 0
@@ -69,7 +65,7 @@ Partial Class Form1
         '
         'NextBtn
         '
-        Me.NextBtn.Location = New System.Drawing.Point(499, 469)
+        Me.NextBtn.Location = New System.Drawing.Point(429, 472)
         Me.NextBtn.Name = "NextBtn"
         Me.NextBtn.Size = New System.Drawing.Size(75, 23)
         Me.NextBtn.TabIndex = 1
@@ -78,7 +74,7 @@ Partial Class Form1
         '
         'BackBtn
         '
-        Me.BackBtn.Location = New System.Drawing.Point(418, 469)
+        Me.BackBtn.Location = New System.Drawing.Point(348, 472)
         Me.BackBtn.Name = "BackBtn"
         Me.BackBtn.Size = New System.Drawing.Size(75, 23)
         Me.BackBtn.TabIndex = 2
@@ -87,11 +83,11 @@ Partial Class Form1
         '
         'MainPanel
         '
+        Me.MainPanel.BackColor = System.Drawing.SystemColors.Control
         Me.MainPanel.Controls.Add(Me.TabControl1)
-        Me.MainPanel.Controls.Add(Me.Panel1)
         Me.MainPanel.Location = New System.Drawing.Point(0, 0)
         Me.MainPanel.Name = "MainPanel"
-        Me.MainPanel.Size = New System.Drawing.Size(696, 463)
+        Me.MainPanel.Size = New System.Drawing.Size(626, 463)
         Me.MainPanel.TabIndex = 3
         '
         'TabControl1
@@ -99,14 +95,15 @@ Partial Class Form1
         Me.TabControl1.Controls.Add(Me.WelcomePage)
         Me.TabControl1.Controls.Add(Me.InstallationPage)
         Me.TabControl1.Controls.Add(Me.ProgressPage)
-        Me.TabControl1.Location = New System.Drawing.Point(154, 4)
+        Me.TabControl1.Location = New System.Drawing.Point(3, 4)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(539, 456)
+        Me.TabControl1.Size = New System.Drawing.Size(620, 456)
         Me.TabControl1.TabIndex = 1
         '
         'WelcomePage
         '
+        Me.WelcomePage.BackColor = System.Drawing.Color.White
         Me.WelcomePage.Controls.Add(Me.VIALabel2)
         Me.WelcomePage.Controls.Add(Me.VAILabel)
         Me.WelcomePage.Controls.Add(Me.VAICombo)
@@ -115,15 +112,14 @@ Partial Class Form1
         Me.WelcomePage.Location = New System.Drawing.Point(4, 22)
         Me.WelcomePage.Name = "WelcomePage"
         Me.WelcomePage.Padding = New System.Windows.Forms.Padding(3)
-        Me.WelcomePage.Size = New System.Drawing.Size(531, 430)
+        Me.WelcomePage.Size = New System.Drawing.Size(612, 430)
         Me.WelcomePage.TabIndex = 0
         Me.WelcomePage.Text = "Welcome page"
-        Me.WelcomePage.UseVisualStyleBackColor = True
         '
         'VIALabel2
         '
         Me.VIALabel2.AutoSize = True
-        Me.VIALabel2.Location = New System.Drawing.Point(6, 414)
+        Me.VIALabel2.Location = New System.Drawing.Point(13, 414)
         Me.VIALabel2.Name = "VIALabel2"
         Me.VIALabel2.Size = New System.Drawing.Size(300, 13)
         Me.VIALabel2.TabIndex = 5
@@ -132,7 +128,7 @@ Partial Class Form1
         'VAILabel
         '
         Me.VAILabel.AutoSize = True
-        Me.VAILabel.Location = New System.Drawing.Point(13, 94)
+        Me.VAILabel.Location = New System.Drawing.Point(14, 75)
         Me.VAILabel.Name = "VAILabel"
         Me.VAILabel.Size = New System.Drawing.Size(194, 13)
         Me.VAILabel.TabIndex = 4
@@ -143,7 +139,7 @@ Partial Class Form1
         Me.VAICombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.VAICombo.FormattingEnabled = True
         Me.VAICombo.Items.AddRange(New Object() {"Update", "Uninstall"})
-        Me.VAICombo.Location = New System.Drawing.Point(213, 90)
+        Me.VAICombo.Location = New System.Drawing.Point(214, 71)
         Me.VAICombo.Name = "VAICombo"
         Me.VAICombo.Size = New System.Drawing.Size(312, 21)
         Me.VAICombo.TabIndex = 3
@@ -153,10 +149,10 @@ Partial Class Form1
         Me.WelcomePageLabel2.AutoSize = True
         Me.WelcomePageLabel2.Location = New System.Drawing.Point(13, 42)
         Me.WelcomePageLabel2.Name = "WelcomePageLabel2"
-        Me.WelcomePageLabel2.Size = New System.Drawing.Size(479, 26)
+        Me.WelcomePageLabel2.Size = New System.Drawing.Size(582, 26)
         Me.WelcomePageLabel2.TabIndex = 1
         Me.WelcomePageLabel2.Text = "V++ is a small, open-source, language made for background apps with little to no " &
-    "input from the user," & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "but it can be used for other stuff too." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
+    "input from the user, but it can be used for" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "other stuff too."
         '
         'WelcomePageLabel1
         '
@@ -170,6 +166,7 @@ Partial Class Form1
         '
         'InstallationPage
         '
+        Me.InstallationPage.BackColor = System.Drawing.Color.White
         Me.InstallationPage.Controls.Add(Me.InstallationPageChk4)
         Me.InstallationPage.Controls.Add(Me.LegacyPath)
         Me.InstallationPage.Controls.Add(Me.InstallationPageChk3)
@@ -181,10 +178,9 @@ Partial Class Form1
         Me.InstallationPage.Location = New System.Drawing.Point(4, 22)
         Me.InstallationPage.Name = "InstallationPage"
         Me.InstallationPage.Padding = New System.Windows.Forms.Padding(3)
-        Me.InstallationPage.Size = New System.Drawing.Size(531, 430)
+        Me.InstallationPage.Size = New System.Drawing.Size(533, 430)
         Me.InstallationPage.TabIndex = 1
         Me.InstallationPage.Text = "Collecting data"
-        Me.InstallationPage.UseVisualStyleBackColor = True
         '
         'InstallationPageChk4
         '
@@ -268,15 +264,15 @@ Partial Class Form1
         '
         'ProgressPage
         '
+        Me.ProgressPage.BackColor = System.Drawing.Color.White
         Me.ProgressPage.Controls.Add(Me.ProgressPageText)
         Me.ProgressPage.Controls.Add(Me.ProgressPagePB)
         Me.ProgressPage.Controls.Add(Me.ProgressPageTitle)
         Me.ProgressPage.Location = New System.Drawing.Point(4, 22)
         Me.ProgressPage.Name = "ProgressPage"
-        Me.ProgressPage.Size = New System.Drawing.Size(531, 430)
+        Me.ProgressPage.Size = New System.Drawing.Size(533, 430)
         Me.ProgressPage.TabIndex = 2
         Me.ProgressPage.Text = "Processing"
-        Me.ProgressPage.UseVisualStyleBackColor = True
         '
         'ProgressPageText
         '
@@ -305,32 +301,11 @@ Partial Class Form1
         Me.ProgressPageTitle.TabIndex = 3
         Me.ProgressPageTitle.Text = "Please wait..."
         '
-        'Panel1
-        '
-        Me.Panel1.BackColor = System.Drawing.Color.CadetBlue
-        Me.Panel1.Controls.Add(Me.PictureBox2)
-        Me.Panel1.Location = New System.Drawing.Point(3, 3)
-        Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(145, 457)
-        Me.Panel1.TabIndex = 0
-        '
-        'PictureBox2
-        '
-        Me.PictureBox2.BackColor = System.Drawing.Color.Transparent
-        Me.PictureBox2.Image = Global.vppsetup.My.Resources.Resources.vppicon
-        Me.PictureBox2.InitialImage = Nothing
-        Me.PictureBox2.Location = New System.Drawing.Point(9, 9)
-        Me.PictureBox2.Name = "PictureBox2"
-        Me.PictureBox2.Size = New System.Drawing.Size(125, 125)
-        Me.PictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
-        Me.PictureBox2.TabIndex = 1
-        Me.PictureBox2.TabStop = False
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(696, 507)
+        Me.ClientSize = New System.Drawing.Size(625, 507)
         Me.Controls.Add(Me.MainPanel)
         Me.Controls.Add(Me.BackBtn)
         Me.Controls.Add(Me.NextBtn)
@@ -349,8 +324,6 @@ Partial Class Form1
         Me.InstallationPage.PerformLayout()
         Me.ProgressPage.ResumeLayout(False)
         Me.ProgressPage.PerformLayout()
-        Me.Panel1.ResumeLayout(False)
-        CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -375,10 +348,8 @@ Partial Class Form1
     Friend WithEvents InstallationPageChk3 As CheckBox
     Friend WithEvents VAILabel As Label
     Friend WithEvents VAICombo As ComboBox
-    Friend WithEvents Panel1 As Panel
     Friend WithEvents VIALabel2 As Label
     Friend WithEvents InstallationPage As TabPage
     Friend WithEvents LegacyPath As CheckBox
-    Friend WithEvents PictureBox2 As PictureBox
     Friend WithEvents InstallationPageChk4 As CheckBox
 End Class

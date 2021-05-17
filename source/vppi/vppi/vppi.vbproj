@@ -130,7 +130,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="VppInterpreter.vb" />
-    <Compile Include="WindowUIManager.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -168,6 +167,16 @@
   <ItemGroup>
     <Content Include="newvpplogo.ico" />
     <None Include="Resources\VppWindowIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\vppi_ext_http\vppi_ext_http.vbproj">
+      <Project>{d538052e-ad5a-4f85-84d5-d3a014d0b717}</Project>
+      <Name>vppi_ext_http</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\vppi_ext_lui\vppi_ext_lui.vbproj">
+      <Project>{9efd9e2b-77bb-4bf8-8ad6-259a05025f59}</Project>
+      <Name>vppi_ext_lui</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

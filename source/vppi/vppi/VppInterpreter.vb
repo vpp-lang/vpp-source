@@ -11,6 +11,8 @@ Imports System.Net
 Imports System.Web
 Imports System.Web.Script.Serialization
 Imports System.Runtime.InteropServices
+Imports vppi_ext_lui
+Imports vppi_ext_http
 
 ''' <summary>
 ''' The V++ interpreter class. Check https://github.com/VMGP/vppi/wiki.
@@ -109,6 +111,7 @@ Public Class VppInterpreter
     Public eventhandlers As New Dictionary(Of String, String)
     Public nv_eventname As String = ""
     Dim systemevents As String() = {"ReceivedCommandFromComFile", "GUI_MouseClick"}
+    Public canevent = False
 
     'Variable defining and similar stuff
     Public nv_const = False
@@ -116,7 +119,7 @@ Public Class VppInterpreter
     Public nv_temp = False
 
     'Web Requests
-    Public webheaders As New Dictionary(Of String, String)
+    Public webreqclass As New HTTPRequest()
 
     'File communication
     WithEvents comwatch As New FileSystemWatcher
@@ -247,6 +250,7 @@ Public Class VppInterpreter
         tmpip1 = -1
         canexec = True
         state = 0
+        canevent = True
     End Sub
 
     ''' <summary>
@@ -305,7 +309,11 @@ Public Class VppInterpreter
                     log("[" + DateTime.Now.ToString + "-S]: Defined function """ + sinsset(1) + """, ip: " + tmpip.ToString)
                 End If
                 If systemevents.Contains(nv_eventname) Then
-                    eventhandlers.Add(nv_eventname, sinsset(1))
+                    If eventhandlers.ContainsKey(nv_eventname) Then
+                        eventhandlers.Remove(nv_eventname)
+                        exceptionmsg("Event """ + nv_eventname + """ has more than one handler function.", "", 1)
+                        eventhandlers.Add(nv_eventname, sinsset(1))
+                    End If
                     log("[" + DateTime.Now.ToString + "-S]: Function " + sinsset(1) + " connected to the """ + nv_eventname + """ event.")
                 End If
             ElseIf sinsset(0) = "@HandleEvent" Then
@@ -349,6 +357,7 @@ Public Class VppInterpreter
             Static insset() As String
 
             If canexec Then
+                canexec = False
                 Try
                     teststring = ac.Item(ip)
                 Catch ex As ArgumentOutOfRangeException
@@ -366,6 +375,7 @@ Public Class VppInterpreter
                 End If
 
                 ip = ip + 1
+                canexec = True
             End If
         Else
 
@@ -390,7 +400,6 @@ Public Class VppInterpreter
     End Sub
 
     Function removeun(_insset1 As String)
-        canexec = False
         tmpval4 = ""
 
         For Each ii In _insset1
@@ -403,7 +412,6 @@ Public Class VppInterpreter
             End If
         Next
 
-        canexec = True
         Return tmpval4
     End Function
 
@@ -447,6 +455,8 @@ Public Class VppInterpreter
             ElseIf insset(0) = "[const]" Then
                 nv_const = True
             ElseIf insset(0) = "[temp]" Then
+                nv_temp = True
+            ElseIf insset(0) = "EventHandled" Then
                 nv_temp = True
             ElseIf insset(0) = "gotolast" Then
                 If usecallstack = True Then
@@ -518,7 +528,7 @@ Public Class VppInterpreter
     End Function
 
     ''' <summary>
-    ''' Exception message. Check https://github.com/VMGP/vppi/wiki
+    ''' Exception message.
     ''' </summary>
     ''' <param name="message">Exception message.</param>
     ''' <param name="errcode">Error code.</param>
@@ -530,10 +540,8 @@ Public Class VppInterpreter
         If severity = 0 Then
             Console.WriteLine("Error: [" + errcode + ":" + (ip + 1).ToString + "] at " + threadname + ": " + message)
         ElseIf severity = 1 Then
-            If nowarn = True Then
-                Exit Sub
-            End If
             Console.WriteLine("Warning: [" + errcode + ":" + (ip + 1).ToString + "] at " + threadname + ": " + message)
+            Exit Sub
         End If
         Console.WriteLine(returnstrace())
         If ignoreerr = True Then
@@ -615,7 +623,7 @@ Public Class VppInterpreter
         ip = objects(fname).value - 1 + ipadd
         nf = fname
         tmpval4 = Nothing
-        canexec = True
+        'canexec = True
     End Sub
 
     Function getvar(insset_getvar As String())
@@ -1224,7 +1232,7 @@ Public Class VppInterpreter
                         tmpval2 = vppstring_to_string(parameters(2))
                     End If
                     If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = Chr(34) + webreq(tmpval2) + Chr(34)
+                        objects(parameters(1)).value = Chr(34) + webreqclass.webreq(tmpval2) + Chr(34)
                     Else
 
                     End If
@@ -1246,7 +1254,7 @@ Public Class VppInterpreter
                         tmpval1 = vppstring_to_string(parameters(3))
                     End If
                     If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = Chr(34) + webreq(tmpval2, tmpval1, parameters(4)) + Chr(34)
+                        objects(parameters(1)).value = Chr(34) + webreqclass.webreq(tmpval2, tmpval1, parameters(4)) + Chr(34)
                     Else
 
                     End If
@@ -1266,17 +1274,17 @@ Public Class VppInterpreter
                     Else
                         tmpval1 = vppstring_to_string(parameters(2))
                     End If
-                    If webheaders.ContainsKey(tmpval2) Then
-                        webheaders(tmpval2) = tmpval1
+                    If webreqclass.webheaders.ContainsKey(tmpval2) Then
+                        webreqclass.webheaders(tmpval2) = tmpval1
                     Else
-                        webheaders.Add(tmpval2, tmpval1)
+                        webreqclass.webheaders.Add(tmpval2, tmpval1)
                     End If
                 Catch ex As Exception
                     exceptionmsg("General exception. " + ex.Message, "g_0003")
                 End Try
             ElseIf parameters(0) = "0x001D" Then
                 Try
-                    webheaders.Clear()
+                    webreqclass.webheaders.Clear()
                 Catch ex As Exception
                     exceptionmsg("General exception. " + ex.Message, "g_0003")
                 End Try
@@ -1304,6 +1312,8 @@ Public Class VppInterpreter
                         command(vppstring_to_string(parameters(1)))
                     End If
                 End If
+            ElseIf parameters(0) = "0x0023" Then
+
             ElseIf parameters(0) = "0x0050" Then
                 If objects.ContainsKey(parameters(1)) Then
                     tmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
@@ -1321,7 +1331,7 @@ Public Class VppInterpreter
                     tmpval3 = vppstring_to_string(parameters(3))
                 End If
                 If config("vppi_allow_gui") Then
-                    guiwindow = New WindowUIManager(New Drawing.Size(tmpval1, tmpval2), tmpval3)
+                    guiwindow = New WindowUIManager(New Drawing.Size(tmpval1, tmpval2), tmpval3, My.Resources.newvpplogo)
                 End If
             ElseIf parameters(0) = "0x0051" Then
                 'Coordinates
@@ -1567,44 +1577,6 @@ Public Class VppInterpreter
         Return val.ToArray()
     End Function
 
-    ''' <summary>
-    ''' Simple web request.
-    ''' </summary>
-    ''' <param name="requrl">URL Path</param>
-    ''' <returns>Response.</returns>
-    Function webreq(requrl As String)
-        Dim wc As New WebClient
-
-        For Each i As KeyValuePair(Of String, String) In webheaders
-            wc.Headers.Add(i.Key, i.Value)
-        Next
-
-        Return wc.DownloadString(requrl)
-    End Function
-
-    ''' <summary>
-    ''' Web request with POST.
-    ''' </summary>
-    ''' <param name="requrl">URL Path</param>
-    ''' <param name="uploadstr">String for post request.</param>
-    ''' <returns>Response.</returns>
-    Function webreq(requrl As String, uploadstr As String, method As String)
-        Dim wc As New WebClient
-
-        tmpval2 = "null"
-
-        For Each i As KeyValuePair(Of String, String) In webheaders
-            wc.Headers.Add(i.Key, i.Value)
-        Next
-
-        Try
-            tmpval2 = wc.UploadString(requrl, vppstring_to_string(method), uploadstr)
-        Catch ex As WebException
-            tmpval2 = "null"
-        End Try
-
-        Return tmpval2
-    End Function
 
     Function _gettype(value As DefineObject)
         If value.value.Contains(Chr(34)) Then
@@ -1826,6 +1798,7 @@ Public Class VppInterpreter
 
     Sub invokeevent(eventname, args)
         If eventhandlers.ContainsKey(eventname) Then
+            canevent = False
             log("[" + DateTime.Now.ToString + "]: " + "Event raised by user. Event name: ""GUI_MouseClick"", Event handler: """ + eventhandlers(eventname) + """")
             execfunc(eventhandlers(eventname), args)
         End If

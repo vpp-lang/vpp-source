@@ -10,3 +10,4 @@ C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.vbprojAssemblyReference.cac
 C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.exe
 C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.xml
 C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.pdb
+C:\Users\MATEI\source\repos\vpps\vpps\obj\Debug\vpps.FeedbackForm.resources

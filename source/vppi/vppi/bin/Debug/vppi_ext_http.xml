@@ -1,0 +1,41 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+vppi_ext_http
+</name>
+</assembly>
+<members>
+<member name="T:vppi_ext_http.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:vppi_ext_http.My.Resources.Resources.ResourceManager">
+<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member>
+<member name="P:vppi_ext_http.My.Resources.Resources.Culture">
+<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member>
+<member name="M:vppi_ext_http.HTTPRequest.webreq(System.String)">
+ <summary>
+ Simple web request.
+ </summary>
+ <param name="requrl">URL Path</param>
+ <returns>Response.</returns>
+</member>
+<member name="M:vppi_ext_http.HTTPRequest.webreq(System.String,System.String,System.String)">
+ <summary>
+ Web request with POST.
+ </summary>
+ <param name="requrl">URL Path</param>
+ <param name="uploadstr">String for post request.</param>
+ <returns>Response.</returns>
+</member>
+</members>
+</doc>

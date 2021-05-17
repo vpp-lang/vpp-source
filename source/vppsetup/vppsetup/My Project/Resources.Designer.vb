@@ -71,16 +71,6 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized resource of type System.Byte[].
-        '''</summary>
-        Public ReadOnly Property vppi() As Byte()
-            Get
-                Dim obj As Object = ResourceManager.GetObject("vppi", resourceCulture)
-                Return CType(obj,Byte())
-            End Get
-        End Property
-        
-        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
         Public ReadOnly Property vppicon() As System.Drawing.Bitmap
@@ -91,32 +81,22 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized resource of type System.Byte[].
-        '''</summary>
-        Public ReadOnly Property vpppm() As Byte()
-            Get
-                Dim obj As Object = ResourceManager.GetObject("vpppm", resourceCulture)
-                Return CType(obj,Byte())
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Byte[].
-        '''</summary>
-        Public ReadOnly Property vpps() As Byte()
-            Get
-                Dim obj As Object = ResourceManager.GetObject("vpps", resourceCulture)
-                Return CType(obj,Byte())
-            End Get
-        End Property
-        
-        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
         Public ReadOnly Property vppthumb() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("vppthumb", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Byte[].
+        '''</summary>
+        Public ReadOnly Property vppzip() As Byte()
+            Get
+                Dim obj As Object = ResourceManager.GetObject("vppzip", resourceCulture)
+                Return CType(obj,Byte())
             End Get
         End Property
     End Module

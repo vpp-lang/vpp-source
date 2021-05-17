@@ -1,0 +1,9 @@
+C:\Users\MATEI\source\repos\vppi\vppi_ext_http\bin\Debug\vppi_ext_http.dll
+C:\Users\MATEI\source\repos\vppi\vppi_ext_http\bin\Debug\vppi_ext_http.pdb
+C:\Users\MATEI\source\repos\vppi\vppi_ext_http\bin\Debug\vppi_ext_http.xml
+C:\Users\MATEI\source\repos\vppi\vppi_ext_http\obj\Debug\vppi_ext_http.vbprojAssemblyReference.cache
+C:\Users\MATEI\source\repos\vppi\vppi_ext_http\obj\Debug\vppi_ext_http.Resources.resources
+C:\Users\MATEI\source\repos\vppi\vppi_ext_http\obj\Debug\vppi_ext_http.vbproj.GenerateResource.cache
+C:\Users\MATEI\source\repos\vppi\vppi_ext_http\obj\Debug\vppi_ext_http.dll
+C:\Users\MATEI\source\repos\vppi\vppi_ext_http\obj\Debug\vppi_ext_http.xml
+C:\Users\MATEI\source\repos\vppi\vppi_ext_http\obj\Debug\vppi_ext_http.pdb

@@ -127,13 +127,7 @@
   <data name="_7zr" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\_7zr.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="vppi" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\vppi.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="vpppm" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\vpppm.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="vpps" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\vpps.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="vppzip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\vppzip.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

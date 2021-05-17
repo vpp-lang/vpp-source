@@ -27,29 +27,19 @@ vppsetup
   Looks up a localized resource of type System.Byte[].
 </summary>
 </member>
-<member name="P:vppsetup.My.Resources.Resources.vppi">
-<summary>
-  Looks up a localized resource of type System.Byte[].
-</summary>
-</member>
 <member name="P:vppsetup.My.Resources.Resources.vppicon">
 <summary>
   Looks up a localized resource of type System.Drawing.Bitmap.
 </summary>
 </member>
-<member name="P:vppsetup.My.Resources.Resources.vpppm">
-<summary>
-  Looks up a localized resource of type System.Byte[].
-</summary>
-</member>
-<member name="P:vppsetup.My.Resources.Resources.vpps">
-<summary>
-  Looks up a localized resource of type System.Byte[].
-</summary>
-</member>
 <member name="P:vppsetup.My.Resources.Resources.vppthumb">
 <summary>
   Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member>
+<member name="P:vppsetup.My.Resources.Resources.vppzip">
+<summary>
+  Looks up a localized resource of type System.Byte[].
 </summary>
 </member>
 </members>

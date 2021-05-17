@@ -108,6 +108,12 @@
     <Compile Include="DepForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FeedbackForm.Designer.vb">
+      <DependentUpon>FeedbackForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FeedbackForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -135,6 +141,9 @@
   <ItemGroup>
     <EmbeddedResource Include="DepForm.resx">
       <DependentUpon>DepForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FeedbackForm.resx">
+      <DependentUpon>FeedbackForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.vb</DependentUpon>

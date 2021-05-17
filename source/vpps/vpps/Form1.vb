@@ -5,7 +5,7 @@ Imports System.Net
 Public Class Form1
     Public logfile As StreamWriter
     Public prerelease = False
-    Public versub = "-hf1"
+    Public versub = ""
 
     Public egnum = 0
     Public pendingup = False
@@ -152,5 +152,24 @@ Public Class Form1
         Catch ex As Exception
 
         End Try
+    End Sub
+
+    Private Sub DSCLink_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles DSCLink.LinkClicked
+        Process.Start("https://discord.gg/rGAZTFEPXY")
+    End Sub
+
+    Private Sub GHDLink_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles GHDLink.LinkClicked
+        Process.Start("https://github.com/vpp-lang/vpp-source/discussions")
+    End Sub
+
+    Private Sub GHILink_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles GHILink.LinkClicked
+        Process.Start("https://github.com/vpp-lang/vpp-source/issues")
+    End Sub
+
+    Private Sub GFBtn_Click(sender As Object, e As EventArgs) Handles GFBtn.Click
+        'Dim fdbfrm As FeedbackForm = New FeedbackForm()
+        'fdbfrm._info_vppver = My.Application.Info.Version.ToString + versub
+        'fdbfrm.ShowDialog()
+        MsgBox("Feauture not ready!", MsgBoxStyle.Critical, "V++")
     End Sub
 End Class

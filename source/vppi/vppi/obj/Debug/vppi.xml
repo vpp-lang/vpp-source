@@ -75,26 +75,11 @@ vppi
 </member>
 <member name="M:vppi.VppInterpreter.exceptionmsg(System.String,System.String,System.Int32,System.Boolean)">
  <summary>
- Exception message. Check https://github.com/VMGP/vppi/wiki
+ Exception message.
  </summary>
  <param name="message">Exception message.</param>
  <param name="errcode">Error code.</param>
  <param name="severity"></param>
-</member>
-<member name="M:vppi.VppInterpreter.webreq(System.String)">
- <summary>
- Simple web request.
- </summary>
- <param name="requrl">URL Path</param>
- <returns>Response.</returns>
-</member>
-<member name="M:vppi.VppInterpreter.webreq(System.String,System.String,System.String)">
- <summary>
- Web request with POST.
- </summary>
- <param name="requrl">URL Path</param>
- <param name="uploadstr">String for post request.</param>
- <returns>Response.</returns>
 </member>
 <member name="M:vppi.VppInterpreter.comwatch_Changed(System.Object,System.IO.FileSystemEventArgs)">
  <summary>

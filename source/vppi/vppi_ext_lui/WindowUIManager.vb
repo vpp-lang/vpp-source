@@ -20,7 +20,7 @@ Public Class WindowUIManager
     Public ce_mb As Integer = 0
     Public cei As Boolean = False
 
-    Sub New(windowsize As Drawing.Size, windowtitle As String)
+    Sub New(windowsize As Drawing.Size, windowtitle As String, winicon As Drawing.Icon)
         If didactivate = False Then
             If t Is Nothing Then
 
@@ -31,7 +31,7 @@ Public Class WindowUIManager
             windowhandle = New System.Windows.Forms.Form()
             windowhandle.Size = windowsize
             windowhandle.Text = windowtitle
-            windowhandle.Icon = My.Resources.newvpplogo
+            windowhandle.Icon = winicon
             windowhandle.MaximizeBox = False
             windowhandle.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedDialog
 
@@ -105,3 +105,4 @@ Public Class WindowUIManager
 
     End Sub
 End Class
+

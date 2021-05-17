@@ -11,6 +11,10 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "vpppm", "..\vpppm\vpppm\vpp
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "vppsetup", "..\vppsetup\vppsetup\vppsetup.vbproj", "{4FFEA2BC-176E-463E-B6C0-F7818919CD94}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "vppi_ext_lui", "vppi_ext_lui\vppi_ext_lui.vbproj", "{9EFD9E2B-77BB-4BF8-8AD6-259A05025F59}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "vppi_ext_http", "vppi_ext_http\vppi_ext_http.vbproj", "{D538052E-AD5A-4F85-84D5-D3A014D0B717}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{4FFEA2BC-176E-463E-B6C0-F7818919CD94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FFEA2BC-176E-463E-B6C0-F7818919CD94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FFEA2BC-176E-463E-B6C0-F7818919CD94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EFD9E2B-77BB-4BF8-8AD6-259A05025F59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EFD9E2B-77BB-4BF8-8AD6-259A05025F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EFD9E2B-77BB-4BF8-8AD6-259A05025F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EFD9E2B-77BB-4BF8-8AD6-259A05025F59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D538052E-AD5A-4F85-84D5-D3A014D0B717}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D538052E-AD5A-4F85-84D5-D3A014D0B717}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D538052E-AD5A-4F85-84D5-D3A014D0B717}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D538052E-AD5A-4F85-84D5-D3A014D0B717}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
