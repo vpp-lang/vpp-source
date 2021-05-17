@@ -3,6 +3,7 @@ Imports System.Windows.Forms
 
 Public Class WindowUIManager
     WithEvents windowhandle As System.Windows.Forms.Form
+    Public nt1 As Thread
     Public t As Thread
 
     Public formready = False
@@ -19,8 +20,21 @@ Public Class WindowUIManager
     Public ce_my As Integer = 0
     Public ce_mb As Integer = 0
     Public cei As Boolean = False
+    Dim wsz As Drawing.Size
+    Dim wt As String
+    Dim wic As Drawing.Icon
 
     Sub New(windowsize As Drawing.Size, windowtitle As String, winicon As Drawing.Icon)
+        wsz = windowsize
+        wt = windowtitle
+        wic = winicon
+        Dim ts1 As New ThreadStart(AddressOf newform)
+        nt1 = New Thread(ts1)
+        nt1.Name = "GUIWindowInit"
+        nt1.Start()
+    End Sub
+
+    Private Sub newform()
         If didactivate = False Then
             If t Is Nothing Then
 
@@ -29,16 +43,13 @@ Public Class WindowUIManager
             End If
 
             windowhandle = New System.Windows.Forms.Form()
-            windowhandle.Size = windowsize
-            windowhandle.Text = windowtitle
-            windowhandle.Icon = winicon
+            windowhandle.Size = wsz
+            windowhandle.Text = wt
+            windowhandle.Icon = wic
             windowhandle.MaximizeBox = False
             windowhandle.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedDialog
 
-            Dim ts As New ThreadStart(AddressOf initform)
-            t = New Thread(ts)
-            t.Name = "GUIWindow"
-            t.Start()
+            initform()
 
             While formready = False
 

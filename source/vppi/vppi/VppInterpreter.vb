@@ -193,7 +193,7 @@ Public Class VppInterpreter
                     End If
                 End If
 
-                    tmpval1 += 1
+                tmpval1 += 1
             End While
             cancommunicate = config("vppi_allow_interprocess_communication")
             starttimer = config("vppi_exec_delay")
@@ -370,9 +370,7 @@ Public Class VppInterpreter
                 End If
 
                 insset = Split(teststring)
-                If canexec Then
-                    execfunction(insset, teststring.Length)
-                End If
+                execfunction(insset, teststring.Length)
 
                 ip = ip + 1
                 canexec = True
@@ -577,7 +575,7 @@ Public Class VppInterpreter
     End Function
 
     Sub execfunc(fname As String, fargs As String(), Optional ipadd As Integer = 0)
-        canexec = False
+
         If usecallstack = True Then
             callstack.Push(New CallStackObject(ip, cf, threadname + " :: " + cf))
         End If
