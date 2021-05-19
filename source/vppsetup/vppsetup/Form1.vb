@@ -9,7 +9,7 @@ Public Class Form1
     Dim cargs As List(Of String)
     Dim state = 0
     Dim vai = False
-    Dim versub = "-hf1"
+    Dim versub = "-hf2"
     Dim prerelease = False
 
     Dim pathseparator = Path.DirectorySeparatorChar
@@ -412,8 +412,6 @@ Public Class Form1
         _7zrproc.StartInfo.RedirectStandardError = True
         _7zrproc.Start()
         _7zrproc.WaitForExit()
-        MsgBox(_7zrproc.StandardOutput.ReadToEnd())
-        MsgBox(_7zrproc.StandardError.ReadToEnd())
     End Sub
 
     Private Sub LegacyPath_CheckedChanged(sender As Object, e As EventArgs) Handles LegacyPath.CheckedChanged

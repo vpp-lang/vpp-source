@@ -5,10 +5,12 @@ Imports System.Net
 Public Class Form1
     Public logfile As StreamWriter
     Public prerelease = False
-    Public versub = "-hf1"
+    Public versub = "-hf2"
 
     Public egnum = 0
     Public pendingup = False
+    Dim canreopen = False
+    Dim vpps_proc() As Process
 
     Private Sub LogButton_Click(sender As Object, e As EventArgs) Handles LogButton.Click
         startproc("explorer.exe", getappdir(), False)
@@ -102,6 +104,14 @@ Public Class Form1
             PrereleaseDownload.Enabled = False
             Button1.Enabled = False
         End If
+        checkfu()
+        vpps_proc = Process.GetProcessesByName("vpps")
+        If vpps_proc.Count > 1 Then
+            File.WriteAllText(fixpath(getappdir() + "\vs_osg"), "ok")
+            End
+        Else
+            canreopen = True
+        End If
     End Sub
 
     Function fixpath(ffpath As String)
@@ -128,6 +138,7 @@ Public Class Form1
 
     Private Sub NM_Show_Click(sender As Object, e As EventArgs) Handles NM_Show.Click
         Me.Visible = True
+        Me.Focus()
     End Sub
 
     Private Sub NM_Quit_Click(sender As Object, e As EventArgs) Handles NM_Quit.Click
@@ -171,5 +182,23 @@ Public Class Form1
         'fdbfrm._info_vppver = My.Application.Info.Version.ToString + versub
         'fdbfrm.ShowDialog()
         MsgBox("Feauture not ready!", MsgBoxStyle.Critical, "V++")
+    End Sub
+
+    Private Sub ShowWinT_Tick(sender As Object, e As EventArgs) Handles ShowWinT.Tick
+        If canreopen Then
+            If File.Exists(fixpath(getappdir() + "\vs_osg")) Then
+                File.Delete(fixpath(getappdir() + "\vs_osg"))
+                Me.Visible = True
+                Me.Focus()
+            End If
+        End If
+    End Sub
+
+    Private Sub NotifyIcon1_BalloonTipClicked(sender As Object, e As EventArgs) Handles NotifyIcon1.BalloonTipClicked
+        Me.Visible = True
+        Me.Focus()
+        If pendingup Then
+            TabControl1.SelectedTab = TabPage2
+        End If
     End Sub
 End Class

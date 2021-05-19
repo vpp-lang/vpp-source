@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Form1
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class Form1
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
@@ -55,6 +55,7 @@ Partial Class Form1
         Me.NM_Show = New System.Windows.Forms.ToolStripMenuItem()
         Me.NM_Quit = New System.Windows.Forms.ToolStripMenuItem()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
+        Me.ShowWinT = New System.Windows.Forms.Timer(Me.components)
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -265,7 +266,7 @@ Partial Class Form1
         'CUFCB
         '
         Me.CUFCB.AutoSize = True
-        Me.CUFCB.Location = New System.Drawing.Point(12, 58)
+        Me.CUFCB.Location = New System.Drawing.Point(12, 70)
         Me.CUFCB.Name = "CUFCB"
         Me.CUFCB.Size = New System.Drawing.Size(81, 17)
         Me.CUFCB.TabIndex = 5
@@ -277,7 +278,7 @@ Partial Class Form1
         '
         Me.PrereleaseDownload.AutoSize = True
         Me.PrereleaseDownload.Enabled = False
-        Me.PrereleaseDownload.Location = New System.Drawing.Point(12, 81)
+        Me.PrereleaseDownload.Location = New System.Drawing.Point(12, 93)
         Me.PrereleaseDownload.Name = "PrereleaseDownload"
         Me.PrereleaseDownload.Size = New System.Drawing.Size(221, 17)
         Me.PrereleaseDownload.TabIndex = 4
@@ -366,6 +367,11 @@ Partial Class Form1
         Me.Timer1.Enabled = True
         Me.Timer1.Interval = 300000
         '
+        'ShowWinT
+        '
+        Me.ShowWinT.Enabled = True
+        Me.ShowWinT.Interval = 1000
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -427,4 +433,5 @@ Partial Class Form1
     Friend WithEvents GHDLink As LinkLabel
     Friend WithEvents GFBtn As Button
     Friend WithEvents Label5 As Label
+    Friend WithEvents ShowWinT As Timer
 End Class
