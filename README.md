@@ -15,13 +15,25 @@
 ## Introduction
 V++ is a small static-typed interpreted language made for running small programs in a console window.
 
-This is the V++ interpreter from the V++ programming language package. In order to install the V++ Runtime Environment you must [check releases](https://github.com/vpp-lang/vppi/releases). For documentation [check the V++ wiki](https://github.com/vpp-lang/vppi/wiki).
+This repository contains ``vppsetup``, ``vpps``, ``vppi``, ``vpppm`` and interpreter extensions. In order to install the V++ Runtime Environment you must [check releases](https://github.com/vpp-lang/vppi/releases). For documentation [check the V++ wiki](https://github.com/vpp-lang/vppi/wiki).
 
 
 In case you want to create V++ scripts and need syntax highlighting, you can [install the official V++ VSCode extension](https://marketplace.visualstudio.com/items?itemName=VMGPOfficial.vpp)
 
 ## WARNING
 Indents must be used with tabs, not spaces. If you use space indents, the interpreter will not execute the code.
+
+## Important feautures of V++
+- Security
+- Customizabilty
+- Easy to setup and create a new project
+
+## Running a script on V++
+!! SCRIPTS MUST HAVE A ``.vpp`` EXTENSION IN ORDER FOR THE INTERPRETER TO RUN THEM !!
+
+In order to run a script in V++ you can:
+- drag the script into ``vppi`` or the V++ shortcut on your desktop.
+- run V++ in ``cmd`` (Windows Command Prompt) with the first parameter being the script that you want to run (``vppi test.vpp``)
 
 ## Sample code
 ```
