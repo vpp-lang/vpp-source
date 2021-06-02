@@ -1,4 +1,6 @@
-﻿Public Class FeedbackForm
+﻿Imports System.Net.Mail
+
+Public Class FeedbackForm
     Dim _info_osp = ""
     Dim _info_osv = ""
     Dim _info_unm = ""
@@ -28,4 +30,10 @@
         _info_udn = Environment.UserDomainName
         _info_clrver = Environment.Version.ToString
     End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+    End Sub
+
+
 End Class

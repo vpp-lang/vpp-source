@@ -30,6 +30,7 @@ Partial Class FeedbackForm
         Me.MessageBox = New System.Windows.Forms.RichTextBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.DataLabel = New System.Windows.Forms.Label()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -103,11 +104,21 @@ Partial Class FeedbackForm
         Me.DataLabel.TabIndex = 7
         Me.DataLabel.Text = "Please wait..."
         '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(582, 402)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(113, 23)
+        Me.Button1.TabIndex = 8
+        Me.Button1.Text = "Send feedback"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'FeedbackForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(707, 434)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.DataLabel)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.Label3)
@@ -136,4 +147,5 @@ Partial Class FeedbackForm
     Friend WithEvents MessageBox As RichTextBox
     Friend WithEvents GroupBox1 As GroupBox
     Friend WithEvents DataLabel As Label
+    Friend WithEvents Button1 As Button
 End Class

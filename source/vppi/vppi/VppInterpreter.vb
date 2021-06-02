@@ -1223,7 +1223,6 @@ Public Class VppInterpreter
                 End Try
             ElseIf parameters(0) = "0x001A" Then
                 Try
-                    canexec = False
                     If objects.ContainsKey(parameters(2)) Then
                         tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value).Replace(" ", "")
                     Else
@@ -1234,7 +1233,6 @@ Public Class VppInterpreter
                     Else
 
                     End If
-                    canexec = True
                 Catch ex As Exception
                     exceptionmsg("General exception. " + ex.Message + ex.StackTrace, "g_0003")
                 End Try
@@ -1311,7 +1309,110 @@ Public Class VppInterpreter
                     End If
                 End If
             ElseIf parameters(0) = "0x0023" Then
-
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        Directory.CreateDirectory(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                    Else
+                        Directory.CreateDirectory(vppstring_to_string(parameters(1)))
+                    End If
+                Catch ex As Exception
+                    exceptionmsg("Failed to create directory.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x0024" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(1))
+                    End If
+                    File.Delete(tmpval1)
+                Catch ex As Exception
+                    exceptionmsg("Failed to delete file.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x0025" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(1))
+                    End If
+                    Directory.Delete(tmpval1)
+                Catch ex As Exception
+                    exceptionmsg("Failed to delete directory.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x0026" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(1))
+                    End If
+                    If objects.ContainsKey(parameters(2)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(2))
+                    End If
+                    My.Computer.FileSystem.RenameFile(tmpval1, tmpval2)
+                Catch ex As Exception
+                    exceptionmsg("Failed to rename file.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x0027" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(1))
+                    End If
+                    If objects.ContainsKey(parameters(2)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(2))
+                    End If
+                    My.Computer.FileSystem.RenameDirectory(tmpval1, tmpval2)
+                Catch ex As Exception
+                    exceptionmsg("Failed to rename directory.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x0028" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(1))
+                    End If
+                    Directory.CreateDirectory(tmpval1)
+                Catch ex As Exception
+                    exceptionmsg("Failed to create directory.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x0029" Then
+                Try
+                    If objects.ContainsKey(parameters(2)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(2))
+                    End If
+                    If objects.ContainsKey(parameters(1)) Then
+                        objects(parameters(1)).value = bool_to_string(File.Exists(tmpval1))
+                    Else
+                        exceptionmsg("Failed to access variable.", "d_0001")
+                    End If
+                Catch ex As Exception
+                    exceptionmsg("Failed to access file.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x002A" Then
+                Try
+                    If objects.ContainsKey(parameters(2)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(2))
+                    End If
+                    If objects.ContainsKey(parameters(1)) Then
+                        objects(parameters(1)).value = bool_to_string(Directory.Exists(tmpval1))
+                    Else
+                        exceptionmsg("Failed to access variable.", "d_0001")
+                    End If
+                Catch ex As Exception
+                    exceptionmsg("Failed to access file.", "i_0001")
+                End Try
             ElseIf parameters(0) = "0x0050" Then
                 If objects.ContainsKey(parameters(1)) Then
                     tmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))

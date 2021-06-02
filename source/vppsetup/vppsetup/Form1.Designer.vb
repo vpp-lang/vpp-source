@@ -141,7 +141,7 @@ Partial Class Form1
         Me.VAICombo.Items.AddRange(New Object() {"Update", "Uninstall"})
         Me.VAICombo.Location = New System.Drawing.Point(214, 71)
         Me.VAICombo.Name = "VAICombo"
-        Me.VAICombo.Size = New System.Drawing.Size(312, 21)
+        Me.VAICombo.Size = New System.Drawing.Size(381, 21)
         Me.VAICombo.TabIndex = 3
         '
         'WelcomePageLabel2
@@ -178,7 +178,7 @@ Partial Class Form1
         Me.InstallationPage.Location = New System.Drawing.Point(4, 22)
         Me.InstallationPage.Name = "InstallationPage"
         Me.InstallationPage.Padding = New System.Windows.Forms.Padding(3)
-        Me.InstallationPage.Size = New System.Drawing.Size(533, 430)
+        Me.InstallationPage.Size = New System.Drawing.Size(612, 430)
         Me.InstallationPage.TabIndex = 1
         Me.InstallationPage.Text = "Collecting data"
         '
@@ -270,14 +270,14 @@ Partial Class Form1
         Me.ProgressPage.Controls.Add(Me.ProgressPageTitle)
         Me.ProgressPage.Location = New System.Drawing.Point(4, 22)
         Me.ProgressPage.Name = "ProgressPage"
-        Me.ProgressPage.Size = New System.Drawing.Size(533, 430)
+        Me.ProgressPage.Size = New System.Drawing.Size(612, 430)
         Me.ProgressPage.TabIndex = 2
         Me.ProgressPage.Text = "Processing"
         '
         'ProgressPageText
         '
         Me.ProgressPageText.AutoSize = True
-        Me.ProgressPageText.Location = New System.Drawing.Point(6, 35)
+        Me.ProgressPageText.Location = New System.Drawing.Point(8, 31)
         Me.ProgressPageText.Name = "ProgressPageText"
         Me.ProgressPageText.Size = New System.Drawing.Size(61, 13)
         Me.ProgressPageText.TabIndex = 5
@@ -285,9 +285,9 @@ Partial Class Form1
         '
         'ProgressPagePB
         '
-        Me.ProgressPagePB.Location = New System.Drawing.Point(9, 51)
+        Me.ProgressPagePB.Location = New System.Drawing.Point(9, 47)
         Me.ProgressPagePB.Name = "ProgressPagePB"
-        Me.ProgressPagePB.Size = New System.Drawing.Size(501, 23)
+        Me.ProgressPagePB.Size = New System.Drawing.Size(586, 23)
         Me.ProgressPagePB.Style = System.Windows.Forms.ProgressBarStyle.Marquee
         Me.ProgressPagePB.TabIndex = 4
         '
@@ -295,7 +295,7 @@ Partial Class Form1
         '
         Me.ProgressPageTitle.AutoSize = True
         Me.ProgressPageTitle.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.0!)
-        Me.ProgressPageTitle.Location = New System.Drawing.Point(3, 0)
+        Me.ProgressPageTitle.Location = New System.Drawing.Point(5, 0)
         Me.ProgressPageTitle.Name = "ProgressPageTitle"
         Me.ProgressPageTitle.Size = New System.Drawing.Size(177, 31)
         Me.ProgressPageTitle.TabIndex = 3
