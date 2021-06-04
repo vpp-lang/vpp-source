@@ -207,7 +207,6 @@ Public Class VppInterpreter
 
     Function varnamebad(varname)
         Dim varnamebadt = False
-        canexec = False
         For Each i In invalidreserved
             If varname.Contains(i) Then
                 If i.Length < 1 Then
@@ -218,7 +217,6 @@ Public Class VppInterpreter
                 varnamebadt = True
             End If
         Next
-        canexec = True
         Return varnamebadt
     End Function
 
@@ -1079,7 +1077,6 @@ Public Class VppInterpreter
             ElseIf parameters(0) = "0x0006" Then
                 canexec = False
                 Console.Read()
-                canexec = True
             ElseIf parameters(0) = "0x0007" Then
                 canexec = False
                 Try
@@ -1091,11 +1088,9 @@ Public Class VppInterpreter
                 Catch ex As Exception
 
                 End Try
-                canexec = True
             ElseIf parameters(0) = "0x0008" Then
                 canexec = False
                 MsgBox(vppstring_to_string(parameters(1)))
-                canexec = True
             ElseIf parameters(0) = "0x000A" Then
                 If gettypefromval(parameters(1)) = "number" Then
                     Console.ForegroundColor = Convert.ToDecimal(parameters(1))
@@ -1135,7 +1130,6 @@ Public Class VppInterpreter
                 If objects.ContainsKey(parameters(1)) Then
                     canexec = False
                     objects(parameters(1)).value = Chr(34) + InputBox(vppstring_to_string(parameters(2))) + Chr(34)
-                    canexec = True
                 Else
 
                 End If
@@ -1254,7 +1248,6 @@ Public Class VppInterpreter
                     Else
 
                     End If
-                    canexec = True
                 Catch ex As Exception
                     exceptionmsg("General exception. " + ex.Message + ex.StackTrace, "g_0003")
                 End Try
@@ -1292,7 +1285,6 @@ Public Class VppInterpreter
                     Else
                         My.Computer.Audio.Play(vppstring_to_string(parameters(1)), AudioPlayMode.Background)
                     End If
-                    canexec = True
                 Catch ex As Exception
                     exceptionmsg("General exception.", "g_0003")
                 End Try
@@ -1348,9 +1340,9 @@ Public Class VppInterpreter
                         tmpval1 = vppstring_to_string(parameters(1))
                     End If
                     If objects.ContainsKey(parameters(2)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(2))
+                        tmpval2 = vppstring_to_string(parameters(2))
                     End If
                     My.Computer.FileSystem.RenameFile(tmpval1, tmpval2)
                 Catch ex As Exception
@@ -1364,9 +1356,9 @@ Public Class VppInterpreter
                         tmpval1 = vppstring_to_string(parameters(1))
                     End If
                     If objects.ContainsKey(parameters(2)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(2))
+                        tmpval2 = vppstring_to_string(parameters(2))
                     End If
                     My.Computer.FileSystem.RenameDirectory(tmpval1, tmpval2)
                 Catch ex As Exception
@@ -1412,6 +1404,22 @@ Public Class VppInterpreter
                     End If
                 Catch ex As Exception
                     exceptionmsg("Failed to access file.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x002B" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    Else
+                        tmpval1 = vppstring_to_string(parameters(1))
+                    End If
+                    If objects.ContainsKey(parameters(2)) Then
+                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    Else
+                        tmpval2 = vppstring_to_string(parameters(2))
+                    End If
+                    webreqclass.downloadfile(tmpval1, tmpval2)
+                Catch ex As Exception
+                    exceptionmsg("Failed to rename file.", "i_0001")
                 End Try
             ElseIf parameters(0) = "0x0050" Then
                 If objects.ContainsKey(parameters(1)) Then
@@ -1564,7 +1572,6 @@ Public Class VppInterpreter
             End If
             canexec = False
             MsgBox(ex.Message + vbNewLine + ip.ToString + vbNewLine + ex.StackTrace)
-            canexec = True
         End Try
     End Sub
 
@@ -1777,7 +1784,6 @@ Public Class VppInterpreter
         Static vpps_tmpval
         vpps_tmpval = ""
         tmpval = ""
-        canexec = False
         For Each i In _value
             If i = Chr(34) Then
                 If tmpval = "\\" Then
@@ -1812,6 +1818,12 @@ Public Class VppInterpreter
                 Else
                     vpps_tmpval = vpps_tmpval + i
                 End If
+            ElseIf i = "e" Then
+                If tmpval = "\\" Then
+                    tmpval = ""
+                Else
+                    vpps_tmpval = vpps_tmpval + i
+                End If
             ElseIf i = "\" Then
                 If modify = False Then
                     vpps_tmpval = vpps_tmpval + "\"
@@ -1841,7 +1853,6 @@ Public Class VppInterpreter
                 End If
             End If
         Next
-        canexec = True
         tmpval = Nothing
         Return vpps_tmpval
     End Function

@@ -128,7 +128,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\vppthumb.png" />
-    <None Include="Resources\7zr.exe" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="newvpplogo.ico" />

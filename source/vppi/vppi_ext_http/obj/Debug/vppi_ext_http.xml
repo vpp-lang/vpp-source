@@ -37,5 +37,12 @@ vppi_ext_http
  <param name="uploadstr">String for post request.</param>
  <returns>Response.</returns>
 </member>
+<member name="M:vppi_ext_http.HTTPRequest.downloadfile(System.String,System.String)">
+ <summary>
+ Download file.
+ </summary>
+ <param name="requrl">URL Path</param>
+ <param name="fname">File name</param>
+</member>
 </members>
 </doc>

@@ -44,4 +44,15 @@ Public Class HTTPRequest
 
         Return tmpval2
     End Function
+
+    ''' <summary>
+    ''' Download file.
+    ''' </summary>
+    ''' <param name="requrl">URL Path</param>
+    ''' <param name="fname">File name</param>
+    Sub downloadfile(requrl As String, fname As String)
+        Dim wc As New WebClient
+
+        wc.DownloadFile(requrl, fname)
+    End Sub
 End Class
