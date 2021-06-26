@@ -5,7 +5,7 @@ Imports System.Net
 Public Class Form1
     Public logfile As StreamWriter
     Public prerelease = False
-    Public versub = "-hf1"
+    Public versub = ""
 
     Public egnum = 0
     Public pendingup = False
@@ -40,6 +40,9 @@ Public Class Form1
 
     Sub checkfu()
         Try
+            If prerelease Then
+                Exit Sub
+            End If
             Me.UseWaitCursor = True
             UpdateStatusLabel.Text = "Checking for updates..."
             Button1.Enabled = False
@@ -52,7 +55,7 @@ Public Class Form1
                 pendingup = True
                 UpdateStatusLabel.Text = "Downloading update..."
                 downloadsetup()
-                NotifyIcon1.ShowBalloonTip(1000, "V++ Settings", "An update is available." + vbNewLine + "Update version: " + nextver + vbNewLine + "Update notes: " + webrequest("http://vpp-lang.github.io/website/sn.txt"), ToolTipIcon.None)
+                NotifyIcon1.ShowBalloonTip(1000, "V++ Settings", "An update is available." + vbNewLine + "Update version: " + nextver + vbNewLine, ToolTipIcon.Info)
                 Me.UseWaitCursor = False
                 Button1.Text = "Install update"
                 Button1.Enabled = True
@@ -102,7 +105,7 @@ Public Class Form1
             Me.Text = "[Prerelease] V++ Settings"
             PrereleaseDownload.Checked = True
             PrereleaseDownload.Enabled = False
-            Button1.Enabled = False
+            TabControl1.TabPages.Remove(TabPage2)
         End If
         checkfu()
         vpps_proc = Process.GetProcessesByName("vpps")
@@ -173,15 +176,8 @@ Public Class Form1
         Process.Start("https://github.com/vpp-lang/vpp-source/discussions")
     End Sub
 
-    Private Sub GHILink_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles GHILink.LinkClicked
-        Process.Start("https://github.com/vpp-lang/vpp-source/issues")
-    End Sub
-
     Private Sub GFBtn_Click(sender As Object, e As EventArgs) Handles GFBtn.Click
-        'Dim fdbfrm As FeedbackForm = New FeedbackForm()
-        'fdbfrm._info_vppver = My.Application.Info.Version.ToString + versub
-        'fdbfrm.ShowDialog()
-        MsgBox("Feauture not ready!", MsgBoxStyle.Critical, "V++")
+        Process.Start("https://github.com/vpp-lang/vpp-source/issues")
     End Sub
 
     Private Sub ShowWinT_Tick(sender As Object, e As EventArgs) Handles ShowWinT.Tick
@@ -200,5 +196,9 @@ Public Class Form1
         If pendingup Then
             TabControl1.SelectedTab = TabPage2
         End If
+    End Sub
+
+    Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel1.LinkClicked
+        Process.Start("https://github.com/vpp-lang/vpp-source/issues")
     End Sub
 End Class

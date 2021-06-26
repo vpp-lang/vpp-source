@@ -19,6 +19,7 @@ Public Class WindowUIManager
     Public ce_mx As Integer = 0
     Public ce_my As Integer = 0
     Public ce_mb As Integer = 0
+    Public cmei As Boolean = 0
     Public cei As Boolean = False
     Dim wsz As Drawing.Size
     Dim wt As String
@@ -106,6 +107,7 @@ Public Class WindowUIManager
     Private Sub windowhandle_MouseMove(sender As Object, e As MouseEventArgs) Handles windowhandle.MouseMove
         mousex = e.X
         mousey = e.Y
+        cmei = True
     End Sub
 
     Private Sub windowhandle_MouseClick(sender As Object, e As MouseEventArgs) Handles windowhandle.MouseClick

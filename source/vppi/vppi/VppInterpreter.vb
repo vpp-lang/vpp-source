@@ -31,6 +31,7 @@ Public Class VppInterpreter
         Public _temporary = False
         Public _private = False
         Public _fargs As String()
+        Public _listval As List(Of DefineObject)
 
         Sub New(Optional _type As String = Nothing, Optional _value As Object = Nothing)
             type = _type
@@ -108,10 +109,11 @@ Public Class VppInterpreter
     Public nowarn = False
 
     'Events
-    Public eventhandlers As New Dictionary(Of String, String)
-    Public nv_eventname As String = ""
-    Dim systemevents As String() = {"ReceivedCommandFromComFile", "GUI_MouseClick"}
+    Public eventhandlername As String = ""
+    Public canaevent = False
+    Dim systemevents As String() = {"GUI_MouseMove", "GUI_MouseClick"}
     Public canevent = False
+    Public queuedevents As List(Of String())
 
     'Variable defining and similar stuff
     Public nv_const = False
@@ -285,6 +287,8 @@ Public Class VppInterpreter
                 nf = sinsset(1)
             ElseIf sinsset(0) = "@Include" Then
                 include(sinsset(1))
+            ElseIf sinsset(0) = "@EnvironmentPath" Then
+                Environment.CurrentDirectory = sinsset(1)
             ElseIf sinsset(0) = "@IgnoreErrors" Then
                 ignoreerr = True
             ElseIf sinsset(0) = "@EnableCallStack" Then
@@ -306,18 +310,15 @@ Public Class VppInterpreter
                     objects(sinsset(1))._fargs = parsearguments(sinsset, 2)
                     log("[" + DateTime.Now.ToString + "-S]: Defined function """ + sinsset(1) + """, ip: " + tmpip.ToString)
                 End If
-                If systemevents.Contains(nv_eventname) Then
-                    If eventhandlers.ContainsKey(nv_eventname) Then
-                        eventhandlers.Remove(nv_eventname)
-                        exceptionmsg("Event """ + nv_eventname + """ has more than one handler function.", "", 1)
-                        eventhandlers.Add(nv_eventname, sinsset(1))
+                If eventhandlername.Length < 3 Then
+                    If canaevent Then
+                        canaevent = False
+                        eventhandlername = sinsset(1)
+                        log("[" + DateTime.Now.ToString + "-S]: Function " + sinsset(1) + " connected to the """ + eventhandlername + """ event.")
                     End If
-                    log("[" + DateTime.Now.ToString + "-S]: Function " + sinsset(1) + " connected to the """ + nv_eventname + """ event.")
                 End If
-            ElseIf sinsset(0) = "@HandleEvent" Then
-                If systemevents.Contains(sinsset(1)) Then
-                    nv_eventname = sinsset(1)
-                End If
+            ElseIf sinsset(0) = "[eventhandler]" Then
+                canaevent = True
             Else
 
             End If
@@ -453,7 +454,7 @@ Public Class VppInterpreter
             ElseIf insset(0) = "[temp]" Then
                 nv_temp = True
             ElseIf insset(0) = "EventHandled" Then
-                nv_temp = True
+                canevent = True
             ElseIf insset(0) = "gotolast" Then
                 If usecallstack = True Then
                     If callstack.Peek() IsNot Nothing Then
@@ -468,8 +469,12 @@ Public Class VppInterpreter
 
             ElseIf insset(0) = "if" Then
                 instruction_if(insset)
+            ElseIf insset(0) = "setexecspeed" Then
+                instruction_ss(insset)
             ElseIf insset(0) = "vppmath" Then
                 instruction_math(insset)
+            ElseIf insset(0) = "vpplistop" Then
+                instruction_listop(insset)
             ElseIf insset(0) = "@HandleEvent" Then
 
             ElseIf insset(0) = "end" Then
@@ -699,7 +704,15 @@ Public Class VppInterpreter
         If Not wparameters Is Nothing Then
             canexec = False
             Thread.Sleep(wparameters(0))
-            canexec = True
+        End If
+    End Sub
+
+    Sub instruction_ss(ByVal stringval() As String)
+        Static wparameters As String()
+        wparameters = parsearguments(stringval, 1)
+        If Not wparameters Is Nothing Then
+            canexec = False
+            starttimer = Convert.ToDecimal(wparameters(0))
         End If
     End Sub
 
@@ -834,7 +847,162 @@ Public Class VppInterpreter
             End If
             If objects.ContainsKey(mathparameters(0)) Then
                 If objects(mathparameters(0)).type = "number" Then
-                    objects(mathparameters(0)).value = New Random().Next(tmpval2, tmpval3).ToString()
+                    objects(mathparameters(0)).value = New Random().Next(Convert.ToDecimal(tmpval2), Convert.ToDecimal(tmpval3)).ToString()
+                End If
+            End If
+        ElseIf stringvalmath(2) = "sin" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "number" Then
+                    objects(mathparameters(0)).value = Math.Sin(Convert.ToDecimal(tmpval2)).ToString
+                End If
+            End If
+        ElseIf stringvalmath(2) = "cos" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "number" Then
+                    objects(mathparameters(0)).value = Math.Cos(Convert.ToDecimal(tmpval2)).ToString
+                End If
+            End If
+        ElseIf stringvalmath(2) = "tan" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "number" Then
+                    objects(mathparameters(0)).value = Math.Tan(Convert.ToDecimal(tmpval2)).ToString
+                End If
+            End If
+        ElseIf stringvalmath(2) = "floor" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "number" Then
+                    objects(mathparameters(0)).value = Math.Floor(Convert.ToDecimal(tmpval2)).ToString
+                End If
+            End If
+        ElseIf stringvalmath(2) = "abs" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "number" Then
+                    objects(mathparameters(0)).value = Math.Abs(Convert.ToDecimal(tmpval2)).ToString
+                End If
+            End If
+        ElseIf stringvalmath(2) = "sqrt" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "number" Then
+                    objects(mathparameters(0)).value = Math.Sqrt(Convert.ToDecimal(tmpval2)).ToString
+                End If
+            End If
+        ElseIf stringvalmath(2) = "pow" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If gettypefromval(mathparameters(2)) = "number" Then
+                tmpval3 = mathparameters(2)
+            Else
+                If objects.ContainsKey(mathparameters(2)) Then
+                    tmpval3 = objects(mathparameters(2)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "number" Then
+                    objects(mathparameters(0)).value = Math.Pow(tmpval2, tmpval3).ToString
+                End If
+            End If
+        End If
+    End Sub
+
+    Sub instruction_listop(ByVal stringvalmath() As String)
+        If state = 1 Then
+            Exit Sub
+        End If
+        If stringvalmath(1) = "::" Then
+
+        Else
+            exceptionmsg("Invalid syntax.", "g_0001")
+            Exit Sub
+        End If
+        tmpval2 = Nothing
+        tmpval3 = Nothing
+        Static lparameters As String()
+        lparameters = parsearguments(stringvalmath, 3)
+        If stringvalmath(2) = "additem" Then
+            If objects.ContainsKey(lparameters(1)) Then
+                tmpval2 = objects(lparameters(1))
+            Else
+                tmpval2 = New DefineObject("string", lparameters(1))
+            End If
+            If objects.ContainsKey(lparameters(0)) Then
+                If objects(lparameters(0)).type = "list" Then
+                    objects(lparameters(0))._listval.Add(tmpval2)
+                End If
+            End If
+        ElseIf stringvalmath(2) = "getitem" Then
+            If objects.ContainsKey(lparameters(1)) Then
+                tmpval2 = objects(lparameters(1))
+            End If
+            If objects.ContainsKey(lparameters(2)) Then
+                tmpval3 = Convert.ToDecimal(objects(lparameters(2)).value)
+            Else
+                tmpval3 = Convert.ToDecimal(lparameters(2))
+            End If
+            If objects.ContainsKey(lparameters(0)) Then
+                If objects(lparameters(0)).type = "list" Then
+                    If objects.ContainsKey(lparameters(1)) Then
+                        objects(lparameters(1)).value = objects(lparameters(0))._listval(tmpval3).value
+                    End If
+                End If
+            End If
+        ElseIf stringvalmath(2) = "length" Then
+            If objects.ContainsKey(lparameters(0)) Then
+                tmpval2 = objects(lparameters(0))
+            End If
+            If objects.ContainsKey(lparameters(1)) Then
+                objects(lparameters(1)).value = tmpval2._listval.Count.ToString
+            End If
+        ElseIf stringvalmath(2) = "init" Then
+            If objects.ContainsKey(lparameters(0)) Then
+                If objects(lparameters(0)).type = "list" Then
+                    objects(lparameters(0))._listval = New List(Of DefineObject)
                 End If
             End If
         End If
@@ -957,6 +1125,32 @@ Public Class VppInterpreter
                 Catch ex As Exception
                     exceptionmsg("Internal exception: " + ex.Message + ex.StackTrace, "c_0002")
                 End Try
+            ElseIf vaparameters(0) = "0x0004" Then
+                'Split string
+                Try
+                    If objects.ContainsKey(vaparameters(2)) Then
+                        tmpval3 = objects(vppstring_to_string(vaparameters(2))).value.ToString()
+                    Else
+                        tmpval3 = vppstring_to_string(vaparameters(2))
+                    End If
+                    If objects.ContainsKey(vaparameters(3)) Then
+                        tmpval4 = objects(vaparameters(3)).value.ToString()
+                    Else
+                        tmpval4 = vppstring_to_string(vaparameters(3))
+                    End If
+                    If objects.ContainsKey(vaparameters(1)) Then
+                        atmpval1 = tmpval3.ToString().Split(tmpval4).ToList()
+                        atmpval3 = 0
+                        For Each i In atmpval1
+                            objects(vaparameters(1))._listval.Add(New DefineObject("string", """" + i + """"))
+                            atmpval3 += 1
+                        Next
+                    Else
+                        exceptionmsg("Could not find/access " + vaparameters(1), "d_0001", 1)
+                    End If
+                Catch ex As Exception
+                    'exceptionmsg("Internal exception: " + ex.Message + ex.StackTrace, "c_0002")
+                End Try
             Else
                 exceptionmsg("Invalid parameters given: " + Chr(34) + vaparameters(0) + Chr(34), "c_0001")
             End If
@@ -1024,7 +1218,7 @@ Public Class VppInterpreter
                 ElseIf stringval(3) = "bool" Then
                     If stringval(4) = "=" Then
                         Try
-                            log("[" + DateTime.Now.ToString + "]: Value defined (string). vname: " + Chr(34) + stringval(1) + Chr(34) + ",vval: " + Chr(34) + tmpval + Chr(34))
+                            log("[" + DateTime.Now.ToString + "]: Value defined (bool). vname: " + Chr(34) + stringval(1) + Chr(34) + ",vval: " + Chr(34) + tmpval + Chr(34))
                             objects.Add(stringval(1), New DefineObject("bool", stringval(5)))
                         Catch ex As Exception
                             exceptionmsg("Failed to define variable.", "d_0001")
@@ -1033,8 +1227,17 @@ Public Class VppInterpreter
                 ElseIf stringval(3) = "number" Then
                     If stringval(4) = "=" Then
                         Try
-                            log("[" + DateTime.Now.ToString + "]: Value defined (string). vname: " + Chr(34) + stringval(1) + Chr(34) + ",vval: " + Chr(34) + tmpval + Chr(34))
+                            log("[" + DateTime.Now.ToString + "]: Value defined (number). vname: " + Chr(34) + stringval(1) + Chr(34) + ",vval: " + Chr(34) + tmpval + Chr(34))
                             objects.Add(stringval(1), New DefineObject("number", stringval(5)))
+                        Catch ex As Exception
+                            exceptionmsg("Failed to define variable.", "d_0001")
+                        End Try
+                    End If
+                ElseIf stringval(3) = "list" Then
+                    If stringval(4) = "=" Then
+                        Try
+                            log("[" + DateTime.Now.ToString + "]: Value defined (list). vname: " + Chr(34) + stringval(1) + Chr(34) + ",vval: " + Chr(34) + tmpval + Chr(34))
+                            objects.Add(stringval(1), New DefineObject("list", stringval(5)))
                         Catch ex As Exception
                             exceptionmsg("Failed to define variable.", "d_0001")
                         End Try
@@ -1292,14 +1495,6 @@ Public Class VppInterpreter
                 ShowWindow(GetConsoleWindow(), 0)
             ElseIf parameters(0) = "0x0021" Then
                 ShowWindow(GetConsoleWindow(), 1)
-            ElseIf parameters(0) = "0x0022" Then
-                If cancommunicate Then
-                    If objects.ContainsKey(parameters(1)) Then
-                        command(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
-                    Else
-                        command(vppstring_to_string(parameters(1)))
-                    End If
-                End If
             ElseIf parameters(0) = "0x0023" Then
                 Try
                     If objects.ContainsKey(parameters(1)) Then
@@ -1886,53 +2081,21 @@ Public Class VppInterpreter
         Return tmpval_stra
     End Function
 
-    Function generatecommand(command As String)
-        tmpval4 = ""
-        tmpval4 = "{" + vbNewLine
-        tmpval4 += Chr(9) + Chr(34) + "source" + Chr(34) + ": " + Chr(34) + "vpp" + Chr(34) + "," + vbNewLine
-        tmpval4 += Chr(9) + Chr(34) + "sourceclass" + Chr(34) + ": " + Chr(34) + threadname + Chr(34) + "," + vbNewLine
-        tmpval4 += Chr(9) + Chr(34) + "command" + Chr(34) + ": " + Chr(34) + command + Chr(34) + vbNewLine
-        tmpval4 += "}"
-        Return tmpval4
-    End Function
-
-    Sub command(commandstr As String)
-        My.Computer.FileSystem.WriteAllText(comwatch.Filter, generatecommand(commandstr), False)
-    End Sub
-
     Sub log(logmsg As String)
         If slave = False Then
             logfile.WriteLine(logmsg)
         End If
     End Sub
 
-    Sub invokeevent(eventname, args)
-        If eventhandlers.ContainsKey(eventname) Then
-            canevent = False
-            log("[" + DateTime.Now.ToString + "]: " + "Event raised by user. Event name: ""GUI_MouseClick"", Event handler: """ + eventhandlers(eventname) + """")
-            execfunc(eventhandlers(eventname), args)
+    Sub invokeevent(args)
+        If canevent = True Then
+            If eventhandlername.Length > 3 Then
+                canevent = False
+                log("[" + DateTime.Now.ToString + "]: " + "Event raised. Event name: " + args(0) + ", Event handler: """ + eventhandlername + """")
+                execfunc(eventhandlername, args)
+            End If
         End If
     End Sub
-
-    ''' <summary>
-    ''' Communication file changed.
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    Private Sub comwatch_Changed(sender As Object, e As FileSystemEventArgs) Handles comwatch.Changed
-        Dim comdata As Dictionary(Of String, String) = parsecomfile(Module1.getappcomdir() + "/" + comwatch.Filter)
-        If comdata("source") = "vpp" Then
-
-        Else
-            invokeevent("ReceivedCommandFromComFile", comdata.ToArray())
-        End If
-    End Sub
-
-    Function parsecomfile(data As String)
-        Dim jss As New JavaScriptSerializer()
-        Dim dict As Dictionary(Of String, Object) = jss.Deserialize(Of Dictionary(Of String, Object))(data)
-        Return dict
-    End Function
 
     Sub checkforevents()
         If guiwindow Is Nothing Then
@@ -1940,9 +2103,8 @@ Public Class VppInterpreter
         End If
         If guiwindow.cei Then
             guiwindow.cei = False
-            invokeevent("GUI_MouseClick", {guiwindow.ce_mx.ToString, guiwindow.ce_my.ToString, guiwindow.ce_mb.ToString})
+            invokeevent({"GUI_MouseClick", guiwindow.ce_mx.ToString, guiwindow.ce_my.ToString, guiwindow.ce_mb.ToString})
         End If
-
     End Sub
 #End Region
 

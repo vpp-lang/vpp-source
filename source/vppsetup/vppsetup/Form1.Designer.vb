@@ -119,7 +119,7 @@ Partial Class Form1
         'VIALabel2
         '
         Me.VIALabel2.AutoSize = True
-        Me.VIALabel2.Location = New System.Drawing.Point(13, 414)
+        Me.VIALabel2.Location = New System.Drawing.Point(14, 401)
         Me.VIALabel2.Name = "VIALabel2"
         Me.VIALabel2.Size = New System.Drawing.Size(300, 13)
         Me.VIALabel2.TabIndex = 5

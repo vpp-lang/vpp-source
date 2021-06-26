@@ -28,7 +28,6 @@ Partial Class Form1
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
         Me.DSCLink = New System.Windows.Forms.LinkLabel()
-        Me.GHILink = New System.Windows.Forms.LinkLabel()
         Me.GHDLink = New System.Windows.Forms.LinkLabel()
         Me.GFBtn = New System.Windows.Forms.Button()
         Me.Label5 = New System.Windows.Forms.Label()
@@ -42,6 +41,7 @@ Partial Class Form1
         Me.LogButton = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
+        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         Me.CUFCB = New System.Windows.Forms.CheckBox()
         Me.PrereleaseDownload = New System.Windows.Forms.CheckBox()
         Me.UpdateStatusLabel = New System.Windows.Forms.Label()
@@ -95,13 +95,12 @@ Partial Class Form1
         'GroupBox4
         '
         Me.GroupBox4.Controls.Add(Me.DSCLink)
-        Me.GroupBox4.Controls.Add(Me.GHILink)
         Me.GroupBox4.Controls.Add(Me.GHDLink)
         Me.GroupBox4.Controls.Add(Me.GFBtn)
         Me.GroupBox4.Controls.Add(Me.Label5)
         Me.GroupBox4.Location = New System.Drawing.Point(9, 251)
         Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(467, 92)
+        Me.GroupBox4.Size = New System.Drawing.Size(467, 80)
         Me.GroupBox4.TabIndex = 3
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "Feedback and Issues"
@@ -116,16 +115,6 @@ Partial Class Form1
         Me.DSCLink.TabStop = True
         Me.DSCLink.Text = "Discord server"
         '
-        'GHILink
-        '
-        Me.GHILink.AutoSize = True
-        Me.GHILink.Location = New System.Drawing.Point(10, 73)
-        Me.GHILink.Name = "GHILink"
-        Me.GHILink.Size = New System.Drawing.Size(97, 13)
-        Me.GHILink.TabIndex = 3
-        Me.GHILink.TabStop = True
-        Me.GHILink.Text = "Github issues page"
-        '
         'GHDLink
         '
         Me.GHDLink.AutoSize = True
@@ -138,11 +127,11 @@ Partial Class Form1
         '
         'GFBtn
         '
-        Me.GFBtn.Location = New System.Drawing.Point(300, 63)
+        Me.GFBtn.Location = New System.Drawing.Point(300, 50)
         Me.GFBtn.Name = "GFBtn"
         Me.GFBtn.Size = New System.Drawing.Size(160, 23)
         Me.GFBtn.TabIndex = 1
-        Me.GFBtn.Text = "Give feedback"
+        Me.GFBtn.Text = "Github issues page"
         Me.GFBtn.UseVisualStyleBackColor = True
         '
         'Label5
@@ -249,6 +238,7 @@ Partial Class Form1
         '
         'TabPage2
         '
+        Me.TabPage2.Controls.Add(Me.LinkLabel1)
         Me.TabPage2.Controls.Add(Me.CUFCB)
         Me.TabPage2.Controls.Add(Me.PrereleaseDownload)
         Me.TabPage2.Controls.Add(Me.UpdateStatusLabel)
@@ -263,10 +253,20 @@ Partial Class Form1
         Me.TabPage2.Text = "Update"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
+        'LinkLabel1
+        '
+        Me.LinkLabel1.AutoSize = True
+        Me.LinkLabel1.Location = New System.Drawing.Point(9, 65)
+        Me.LinkLabel1.Name = "LinkLabel1"
+        Me.LinkLabel1.Size = New System.Drawing.Size(79, 13)
+        Me.LinkLabel1.TabIndex = 6
+        Me.LinkLabel1.TabStop = True
+        Me.LinkLabel1.Text = "See changelog"
+        '
         'CUFCB
         '
         Me.CUFCB.AutoSize = True
-        Me.CUFCB.Location = New System.Drawing.Point(12, 70)
+        Me.CUFCB.Location = New System.Drawing.Point(12, 93)
         Me.CUFCB.Name = "CUFCB"
         Me.CUFCB.Size = New System.Drawing.Size(81, 17)
         Me.CUFCB.TabIndex = 5
@@ -278,7 +278,7 @@ Partial Class Form1
         '
         Me.PrereleaseDownload.AutoSize = True
         Me.PrereleaseDownload.Enabled = False
-        Me.PrereleaseDownload.Location = New System.Drawing.Point(12, 93)
+        Me.PrereleaseDownload.Location = New System.Drawing.Point(12, 116)
         Me.PrereleaseDownload.Name = "PrereleaseDownload"
         Me.PrereleaseDownload.Size = New System.Drawing.Size(221, 17)
         Me.PrereleaseDownload.TabIndex = 4
@@ -429,9 +429,9 @@ Partial Class Form1
     Friend WithEvents CUFCB As CheckBox
     Friend WithEvents GroupBox4 As GroupBox
     Friend WithEvents DSCLink As LinkLabel
-    Friend WithEvents GHILink As LinkLabel
     Friend WithEvents GHDLink As LinkLabel
     Friend WithEvents GFBtn As Button
     Friend WithEvents Label5 As Label
     Friend WithEvents ShowWinT As Timer
+    Friend WithEvents LinkLabel1 As LinkLabel
 End Class

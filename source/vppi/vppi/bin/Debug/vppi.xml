@@ -81,12 +81,5 @@ vppi
  <param name="errcode">Error code.</param>
  <param name="severity"></param>
 </member>
-<member name="M:vppi.VppInterpreter.comwatch_Changed(System.Object,System.IO.FileSystemEventArgs)">
- <summary>
- Communication file changed.
- </summary>
- <param name="sender"></param>
- <param name="e"></param>
-</member>
 </members>
 </doc>

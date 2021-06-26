@@ -6,13 +6,14 @@ Module Module1
 
     Dim interpreters As New List(Of VppInterpreter)
     Dim prerelease = False
-    Dim versubfix = "-hf1"
+    Dim versubfix = ""
 
     Dim ts_nowarning = False
     Dim ts_fname = ""
     Dim ts_noconfig = False
 
     Sub Main()
+
         If prerelease Then
             Console.Title = "[Prelease] V++ Interpreter"
         Else
@@ -51,7 +52,11 @@ Module Module1
                 End If
             Next
         Else
-            Console.WriteLine("V++ Console")
+            If prerelease Then
+                Console.WriteLine("[PRELEASE] V++ Console")
+            Else
+                Console.WriteLine("V++ Console")
+            End If
             Console.WriteLine()
             Console.WriteLine("Please specify a script to run. Run with the ""--help"" argument to see all commands.")
             Console.WriteLine("Type ""exit"" to close the console.")

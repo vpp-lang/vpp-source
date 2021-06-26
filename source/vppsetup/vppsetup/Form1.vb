@@ -9,7 +9,7 @@ Public Class Form1
     Dim cargs As List(Of String)
     Dim state = 0
     Dim vai = False
-    Dim versub = "-hf1"
+    Dim versub = ""
     Dim prerelease = False
 
     Dim pathseparator = Path.DirectorySeparatorChar
@@ -359,7 +359,7 @@ Public Class Form1
                 MsgBox("V++ was succesfully installed!", MsgBoxStyle.Information, "V++ Setup")
                 End
             Catch ex As Exception
-                MsgBox("Something went wrong! " + vbNewLine + vbNewLine + "Debug info: " + vbNewLine + "Error message and error code: " + ex.Message + " [" + ex.HResult.ToString + "]" + vbNewLine + "Error source: " + ex.Source + vbNewLine, MsgBoxStyle.Critical, Me.Text)
+                MsgBox("Something went wrong! " + vbNewLine + vbNewLine + "Debug info: " + vbNewLine + "Error message and error code: " + ex.Message + " [" + ex.HResult.ToString + "]" + vbNewLine + "Error source: " + ex.Source, MsgBoxStyle.Critical, Me.Text)
                 If Directory.Exists(getpff()) Then
                     For Each i In Directory.GetFiles(getpff())
                         Try
@@ -416,5 +416,9 @@ Public Class Form1
 
     Private Sub LegacyPath_CheckedChanged(sender As Object, e As EventArgs) Handles LegacyPath.CheckedChanged
         Label1.Text = "V++ will be installed in: " + getpff()
+    End Sub
+
+    Private Sub MainPanel_Paint(sender As Object, e As PaintEventArgs) Handles MainPanel.Paint
+
     End Sub
 End Class
