@@ -111,7 +111,7 @@ Public Class VppInterpreter
     'Events
     Public eventhandlername As String = ""
     Public canaevent = False
-    Dim systemevents As String() = {"GUI_MouseMove", "GUI_MouseClick"}
+    Dim systemevents As String() = {"GUI_KeyDown", "GUI_MouseClick"}
     Public canevent = False
     Public queuedevents As List(Of String())
 
@@ -471,6 +471,8 @@ Public Class VppInterpreter
                 instruction_if(insset)
             ElseIf insset(0) = "setexecspeed" Then
                 instruction_ss(insset)
+            ElseIf insset(0) = "MaskEvent" Then
+
             ElseIf insset(0) = "vppmath" Then
                 instruction_math(insset)
             ElseIf insset(0) = "vpplistop" Then
@@ -654,7 +656,7 @@ Public Class VppInterpreter
                 ElseIf dependencies.ContainsKey(insset(2)) Then
                     If insset(3) = "::" Then
                         If dependencies(insset(2)).objects.ContainsKey(insset(4)) Then
-                            setvalue(insset(0), dependencies(insset(2)).objects(insset(4)))
+                            setvalue(insset(0), dependencies(insset(2)).objects(insset(4)).value)
                         End If
                     End If
                 Else
@@ -1091,7 +1093,7 @@ Public Class VppInterpreter
                         exceptionmsg("Could not find/access " + vaparameters(1), "d_0001", 1)
                     End If
                 Catch ex As Exception
-                    exceptionmsg("Internal exception: " + ex.Message + ex.StackTrace, "c_0002")
+                    exceptionmsg("Internal exception: " + ex.Message, "c_0002")
                 End Try
             ElseIf vaparameters(0) = "0x0002" Then
                 'Converts bool/int to string
@@ -1107,7 +1109,7 @@ Public Class VppInterpreter
                         exceptionmsg("Could not find/access " + vaparameters(1), "d_0001", 1)
                     End If
                 Catch ex As Exception
-                    exceptionmsg("Internal exception: " + ex.Message + ex.StackTrace, "c_0002")
+                    exceptionmsg("Internal exception: " + ex.Message, "c_0002")
                 End Try
             ElseIf vaparameters(0) = "0x0003" Then
                 'Converts string to int
@@ -1123,7 +1125,7 @@ Public Class VppInterpreter
                         exceptionmsg("Could not find/access " + vaparameters(1), "d_0001", 1)
                     End If
                 Catch ex As Exception
-                    exceptionmsg("Internal exception: " + ex.Message + ex.StackTrace, "c_0002")
+                    exceptionmsg("Internal exception: " + ex.Message, "c_0002")
                 End Try
             ElseIf vaparameters(0) = "0x0004" Then
                 'Split string
@@ -1431,7 +1433,7 @@ Public Class VppInterpreter
 
                     End If
                 Catch ex As Exception
-                    exceptionmsg("General exception. " + ex.Message + ex.StackTrace, "g_0003")
+                    exceptionmsg("General exception. " + ex.Message, "g_0003")
                 End Try
             ElseIf parameters(0) = "0x001B" Then
                 Try
@@ -1452,7 +1454,7 @@ Public Class VppInterpreter
 
                     End If
                 Catch ex As Exception
-                    exceptionmsg("General exception. " + ex.Message + ex.StackTrace, "g_0003")
+                    exceptionmsg("General exception. " + ex.Message, "g_0003")
                 End Try
             ElseIf parameters(0) = "0x001C" Then
                 Try
@@ -1766,7 +1768,6 @@ Public Class VppInterpreter
                 exceptionmsg("Internal exception: " + ex.Message, "c_0002")
             End If
             canexec = False
-            MsgBox(ex.Message + vbNewLine + ip.ToString + vbNewLine + ex.StackTrace)
         End Try
     End Sub
 
@@ -1809,7 +1810,6 @@ Public Class VppInterpreter
             End If
         Catch ex As Exception
             canexec = False
-            MsgBox(ex.Message + vbNewLine + ex.StackTrace + vbNewLine + ip.ToString + vbNewLine + threadname + vbNewLine + didsetup.ToString + name, MsgBoxStyle.Critical, "setvalue")
         End Try
     End Sub
 
@@ -1817,7 +1817,7 @@ Public Class VppInterpreter
         Try
             Return objects(name)
         Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Critical, "getvalue")
+
         End Try
     End Function
 
@@ -1825,7 +1825,7 @@ Public Class VppInterpreter
         Try
             objects(name) = value
         Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Critical, "setvalue")
+
         End Try
     End Sub
 
@@ -2104,6 +2104,10 @@ Public Class VppInterpreter
         If guiwindow.cei Then
             guiwindow.cei = False
             invokeevent({"GUI_MouseClick", guiwindow.ce_mx.ToString, guiwindow.ce_my.ToString, guiwindow.ce_mb.ToString})
+        End If
+        If guiwindow.kdii Then
+            guiwindow.kdii = False
+            invokeevent({"GUI_KeyDown", guiwindow.kdi})
         End If
     End Sub
 #End Region

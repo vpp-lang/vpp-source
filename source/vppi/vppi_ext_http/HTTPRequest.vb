@@ -18,7 +18,10 @@ Public Class HTTPRequest
             wc.Headers.Add(i.Key, i.Value)
         Next
 
-        Return wc.DownloadString(requrl)
+        Dim resp = ""
+        resp = wc.DownloadString(requrl)
+
+        Return resp.Replace(vbNullChar, "")
     End Function
 
     ''' <summary>

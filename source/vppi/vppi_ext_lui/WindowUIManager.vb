@@ -19,8 +19,12 @@ Public Class WindowUIManager
     Public ce_mx As Integer = 0
     Public ce_my As Integer = 0
     Public ce_mb As Integer = 0
-    Public cmei As Boolean = 0
+    Public cmei As Boolean = False
     Public cei As Boolean = False
+
+    Public kdi As String = ""
+    Public kdii As Boolean = False
+
     Dim wsz As Drawing.Size
     Dim wt As String
     Dim wic As Drawing.Icon
@@ -115,7 +119,11 @@ Public Class WindowUIManager
         ce_my = e.Y
         ce_mb = Convert.ToDecimal(e.Button)
         cei = True
+    End Sub
 
+    Private Sub windowhandle_KeyDown(sender As Object, e As KeyEventArgs) Handles windowhandle.KeyDown
+        kdi = e.KeyCode.ToString()
+        kdii = True
     End Sub
 End Class
 

@@ -9,7 +9,7 @@ Public Class Form1
     Dim cargs As List(Of String)
     Dim state = 0
     Dim vai = False
-    Dim versub = ""
+    Dim versub = "-hf1"
     Dim prerelease = False
 
     Dim pathseparator = Path.DirectorySeparatorChar
@@ -206,7 +206,7 @@ Public Class Form1
         If Directory.Exists(Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData).ToString()).ToString() + pathseparator + "VPP") = False Then
             Directory.CreateDirectory(Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData).ToString()).ToString() + pathseparator + "VPP")
         End If
-        Return Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData).ToString()).ToString() + "\VPP"
+        Return Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData).ToString()).ToString() + pathseparator + "VPP"
     End Function
 
     Function getlegacypff()
@@ -214,6 +214,9 @@ Public Class Form1
     End Function
 
     Function getappdir()
+        If File.Exists(Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData).ToString).ToString + pathseparator + "vppi") Then
+            File.Create(Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData).ToString).ToString + pathseparator + "vppi")
+        End If
         Return Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData).ToString).ToString + pathseparator + "vppi"
     End Function
 

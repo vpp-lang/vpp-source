@@ -5,7 +5,7 @@ Imports System.Net
 Public Class Form1
     Public logfile As StreamWriter
     Public prerelease = False
-    Public versub = ""
+    Public versub = "-hf1"
 
     Public egnum = 0
     Public pendingup = False
@@ -199,6 +199,6 @@ Public Class Form1
     End Sub
 
     Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel1.LinkClicked
-        Process.Start("https://github.com/vpp-lang/vpp-source/issues")
+        Process.Start("https://vpp-lang.github.io/website/sn.txt")
     End Sub
 End Class

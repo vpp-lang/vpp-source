@@ -1,19 +1,19 @@
 ﻿Imports System.IO
 Imports System.Reflection
 Imports System.Web.Script.Serialization
+Imports System.Windows.Forms
 
 Module Module1
 
     Dim interpreters As New List(Of VppInterpreter)
     Dim prerelease = False
-    Dim versubfix = ""
+    Dim versubfix = "-hf1"
 
     Dim ts_nowarning = False
     Dim ts_fname = ""
     Dim ts_noconfig = False
 
     Sub Main()
-
         If prerelease Then
             Console.Title = "[Prelease] V++ Interpreter"
         Else
