@@ -9,7 +9,7 @@ Public Class Form1
     Dim cargs As List(Of String)
     Dim state = 0
     Dim vai = False
-    Dim versub = "-hf1"
+    Dim versub = ""
     Dim prerelease = False
 
     Dim pathseparator = Path.DirectorySeparatorChar
@@ -214,10 +214,11 @@ Public Class Form1
     End Function
 
     Function getappdir()
-        If File.Exists(Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData).ToString).ToString + pathseparator + "vppi") Then
-            File.Create(Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData).ToString).ToString + pathseparator + "vppi")
+        Dim path1 = Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData).ToString).ToString + pathseparator + "vppi"
+        If Not Directory.Exists(path1) Then
+            Directory.CreateDirectory(path1)
         End If
-        Return Directory.GetParent(Directory.GetParent(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData).ToString).ToString + pathseparator + "vppi"
+        Return path1
     End Function
 
     Sub installvpp()
@@ -362,7 +363,7 @@ Public Class Form1
                 MsgBox("V++ was succesfully installed!", MsgBoxStyle.Information, "V++ Setup")
                 End
             Catch ex As Exception
-                MsgBox("Something went wrong! " + vbNewLine + vbNewLine + "Debug info: " + vbNewLine + "Error message and error code: " + ex.Message + " [" + ex.HResult.ToString + "]" + vbNewLine + "Error source: " + ex.Source, MsgBoxStyle.Critical, Me.Text)
+                MsgBox("Something went wrong! " + vbNewLine + vbNewLine + "Debug info: " + vbNewLine + "Error message and error code: " + ex.Message + " [" + ex.HResult.ToString + "]" + vbNewLine + "Error source: " + ex.StackTrace, MsgBoxStyle.Critical, Me.Text)
                 If Directory.Exists(getpff()) Then
                     For Each i In Directory.GetFiles(getpff())
                         Try

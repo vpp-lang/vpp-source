@@ -7,7 +7,7 @@ Module Module1
 
     Dim interpreters As New List(Of VppInterpreter)
     Dim prerelease = False
-    Dim versubfix = "-hf1"
+    Dim versubfix = ""
 
     Dim ts_nowarning = False
     Dim ts_fname = ""

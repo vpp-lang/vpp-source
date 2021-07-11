@@ -13,6 +13,7 @@ Imports System.Web.Script.Serialization
 Imports System.Runtime.InteropServices
 Imports vppi_ext_lui
 Imports vppi_ext_http
+Imports System.Security.Principal
 
 ''' <summary>
 ''' The V++ interpreter class. Check https://github.com/VMGP/vppi/wiki.
@@ -111,7 +112,7 @@ Public Class VppInterpreter
     'Events
     Public eventhandlername As String = ""
     Public canaevent = False
-    Dim systemevents As String() = {"GUI_KeyDown", "GUI_MouseClick"}
+    Dim systemevents As String() = {"GUI_KeyDown", "GUI_MouseClick", "HTTP_ServerRequest"}
     Public canevent = False
     Public queuedevents As List(Of String())
 
@@ -122,6 +123,7 @@ Public Class VppInterpreter
 
     'Web Requests
     Public webreqclass As New HTTPRequest()
+    Public webserverclass As HTTPServer
 
     'File communication
     WithEvents comwatch As New FileSystemWatcher
@@ -285,6 +287,25 @@ Public Class VppInterpreter
                 threadname = sinsset(1)
             ElseIf sinsset(0) = "@EntryPoint" Then
                 nf = sinsset(1)
+            ElseIf sinsset(0) = "@RequireAdmin" Then
+                Dim W_Id = WindowsIdentity.GetCurrent()
+                Dim WP = New WindowsPrincipal(W_Id)
+                Dim isAdmin As Boolean = WP.IsInRole(WindowsBuiltInRole.Administrator)
+                If isAdmin = False Then
+                    didsetup = True
+                    canexec = False
+                    Dim process As Process = Nothing
+                    Dim processStartInfo As ProcessStartInfo
+                    processStartInfo = New ProcessStartInfo()
+                    processStartInfo.FileName = Application.ExecutablePath
+                    processStartInfo.Verb = "runas"
+
+                    processStartInfo.Arguments = stringa_to_string(My.Application.CommandLineArgs.ToArray())
+                    processStartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
+                    processStartInfo.UseShellExecute = True
+                    process = Process.Start(processStartInfo)
+                    End
+                End If
             ElseIf sinsset(0) = "@Include" Then
                 include(sinsset(1))
             ElseIf sinsset(0) = "@EnvironmentPath" Then
@@ -342,6 +363,9 @@ Public Class VppInterpreter
         ElseIf File.Exists(Module1.getapplibsdir() + fpath) Then
             dependencies.Add(fpath.Substring(fpath.LastIndexOf("\") + 1).Remove(fpath.Substring(fpath.LastIndexOf("\") + 1).LastIndexOf(".")), New VppInterpreter(Module1.getapplibsdir() + fpath, True))
             log("[" + DateTime.Now.ToString + "-S]: Loaded dependency. File path: " + Module1.getapplibsdir() + fpath + " as " + fpath.Substring(fpath.LastIndexOf("\") + 1).Remove(fpath.Substring(fpath.LastIndexOf("\") + 1).LastIndexOf(".")))
+        ElseIf File.Exists(scriptdir + fpath) Then
+            dependencies.Add(fpath.Substring(fpath.LastIndexOf("\") + 1).Remove(fpath.Substring(fpath.LastIndexOf("\") + 1).LastIndexOf(".")), New VppInterpreter(scriptdir + fpath, True))
+            log("[" + DateTime.Now.ToString + "-S]: Loaded dependency. File path: " + scriptdir + fpath + " as " + fpath.Substring(fpath.LastIndexOf("\") + 1).Remove(fpath.Substring(fpath.LastIndexOf("\") + 1).LastIndexOf(".")))
         Else
             log("[" + DateTime.Now.ToString + "-S]: Failed to load dependency. Could not find: " + fpath)
             exceptionmsg("[SETUP]: Failed to load dependency. Could not find: " + fpath, "g_0003", 1)
@@ -595,8 +619,8 @@ Public Class VppInterpreter
                         tmpval3 = objects(fname)._fargs(tmpip1).Split(" ")
 
                         If tmpval3.Length > 1 Then
-                            If objects.ContainsKey(fargs(0)) Then
-                                objects.Add(tmpval3(0), New DefineObject(tmpval3(2), objects(fargs(0))))
+                            If objects.ContainsKey(fargs(tmpip1)) Then
+                                objects.Add(tmpval3(0), New DefineObject(tmpval3(2), objects(fargs(tmpip1))))
                                 objects(tmpval3(0))._temporary = True
                             Else
                                 Try
@@ -668,7 +692,15 @@ Public Class VppInterpreter
                 End If
             Else
                 'Execute function
-                execfunc(insset(0), parsearguments(insset, 1))
+                Dim funcargs As String() = parsearguments(insset, 1)
+                atmpval9 = 0
+                For Each i As String In funcargs
+                    If objects.ContainsKey(i) Then
+                        funcargs(atmpval9) = objects(i).value
+                    End If
+                    atmpval9 += 1
+                Next
+                execfunc(insset(0), funcargs)
             End If
         Else
             If dependencies.ContainsKey(insset(0)) Then
@@ -686,7 +718,15 @@ Public Class VppInterpreter
                         End If
                     Else
                         'Execute function
-                        dependencies(insset(0)).execfunc(insset(2), parsearguments(insset, 3))
+                        Dim funcargs2 As String() = parsearguments(insset, 3)
+                        atmpval9 = 0
+                        For Each i As String In funcargs2
+                            If objects.ContainsKey(i) Then
+                                funcargs2(atmpval9) = objects(i).value
+                            End If
+                            atmpval9 += 1
+                        Next
+                        dependencies(insset(0)).execfunc(insset(2), funcargs2)
                     End If
                 End If
             Else
@@ -1071,21 +1111,21 @@ Public Class VppInterpreter
 
                     If objects.ContainsKey(vaparameters(2)) Then
                         tmpval3 = objects(vppstring_to_string(vaparameters(2))).value.ToString
-                        tmpval = tmpval3.Remove(tmpval3.Length - 2, 1)
-                        tmpval1 = tmpval.ToString.Remove(0, 1)
+                        'tmpval = tmpval3.Remove(tmpval3.Length - 2, 1)
+                        tmpval1 = tmpval3.ToString.Remove(0, 1)
                     Else
                         tmpval3 = vaparameters(2)
-                        tmpval = tmpval3.Remove(tmpval3.Length - 2, 1)
-                        tmpval1 = tmpval.ToString.Remove(0, 1)
+                        'tmpval = tmpval3.Remove(tmpval3.Length - 2, 1)
+                        tmpval1 = tmpval3.ToString.Remove(0, 1)
                     End If
                     If objects.ContainsKey(vaparameters(3)) Then
                         tmpval4 = objects(vppstring_to_string(vaparameters(3))).value.ToString
-                        tmpval = tmpval4.Remove(tmpval4.Length - 2, 1)
-                        tmpval2 = tmpval.ToString.Remove(0, 1)
+                        'tmpval = tmpval4.Remove(tmpval4.Length - 2, 1)
+                        tmpval2 = tmpval4.ToString.Remove(0, 1)
                     Else
                         tmpval4 = vaparameters(3)
-                        tmpval = tmpval4.Remove(tmpval4.Length - 2, 1)
-                        tmpval2 = tmpval.ToString.Remove(0, 1)
+                        'tmpval = tmpval4.Remove(tmpval4.Length - 2, 1)
+                        tmpval2 = tmpval4.ToString.Remove(0, 1)
                     End If
                     If objects.ContainsKey(vaparameters(1)) Then
                         objects(vaparameters(1)).value = Chr(34) + tmpval1 + tmpval2 + Chr(34)
@@ -1340,9 +1380,14 @@ Public Class VppInterpreter
                 End If
             ElseIf parameters(0) = "0x0011" Then
                 Try
+                    If objects.ContainsKey(parameters(2)) Then
+                        atmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value).Replace(" ", "")
+                    Else
+                        atmpval2 = vppstring_to_string(parameters(2))
+                    End If
                     If objects.ContainsKey(parameters(1)) Then
-                        If File.Exists(vppstring_to_string(parameters(2))) Then
-                            objects(parameters(1)).value = Chr(34) + File.ReadAllText(vppstring_to_string(parameters(2))) + Chr(34)
+                        If File.Exists(atmpval2) Then
+                            objects(parameters(1)).value = Chr(34) + File.ReadAllText(atmpval2) + Chr(34)
                         End If
                     Else
 
@@ -1617,6 +1662,41 @@ Public Class VppInterpreter
                     webreqclass.downloadfile(tmpval1, tmpval2)
                 Catch ex As Exception
                     exceptionmsg("Failed to rename file.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x002C" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        atmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    Else
+                        atmpval1 = vppstring_to_string(parameters(1))
+                    End If
+                    webserverclass = New HTTPServer(atmpval1)
+                Catch ex As Exception
+                    exceptionmsg("Failed to start webserver.", "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x002D" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        atmpval1 = objects(vppstring_to_string(parameters(1))).value
+                    Else
+                        atmpval1 = parameters(1)
+                    End If
+                    If objects.ContainsKey(parameters(2)) Then
+                        atmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    Else
+                        atmpval2 = vppstring_to_string(parameters(2))
+                    End If
+                    If objects.ContainsKey(parameters(3)) Then
+                        atmpval3 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
+                    Else
+                        atmpval3 = vppstring_to_string(parameters(3))
+                    End If
+                    webserverclass.in_resp_code = Convert.ToDecimal(atmpval1)
+                    webserverclass.in_resp_body = atmpval2
+                    webserverclass.in_resp_type = atmpval3
+                    webserverclass.in_didresp = True
+                Catch ex As Exception
+                    exceptionmsg("Failed to send response.", "i_0001")
                 End Try
             ElseIf parameters(0) = "0x0050" Then
                 If objects.ContainsKey(parameters(1)) Then
@@ -1996,7 +2076,7 @@ Public Class VppInterpreter
                     If modify = False Then
                         vpps_tmpval = vpps_tmpval + "\\@"
                     ElseIf modify = True Then
-                        vpps_tmpval = vpps_tmpval + scriptdir
+                        vpps_tmpval = vpps_tmpval + scriptdir.Replace("\", "/")
                         tmpval = ""
                     End If
                 Else
@@ -2098,16 +2178,21 @@ Public Class VppInterpreter
     End Sub
 
     Sub checkforevents()
-        If guiwindow Is Nothing Then
-            Exit Sub
+        If guiwindow IsNot Nothing Then
+            If guiwindow.cei Then
+                guiwindow.cei = False
+                invokeevent({"GUI_MouseClick", guiwindow.ce_mx.ToString, guiwindow.ce_my.ToString, guiwindow.ce_mb.ToString})
+            End If
+            If guiwindow.kdii Then
+                guiwindow.kdii = False
+                invokeevent({"GUI_KeyDown", guiwindow.kdi})
+            End If
         End If
-        If guiwindow.cei Then
-            guiwindow.cei = False
-            invokeevent({"GUI_MouseClick", guiwindow.ce_mx.ToString, guiwindow.ce_my.ToString, guiwindow.ce_mb.ToString})
-        End If
-        If guiwindow.kdii Then
-            guiwindow.kdii = False
-            invokeevent({"GUI_KeyDown", guiwindow.kdi})
+        If webserverclass IsNot Nothing Then
+            If webserverclass.out_reqev Then
+                webserverclass.out_reqev = False
+                invokeevent({"HTTP_ServerRequest", webserverclass.out_req_url})
+            End If
         End If
     End Sub
 #End Region
