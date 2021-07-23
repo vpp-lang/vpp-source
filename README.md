@@ -74,3 +74,7 @@ Dropped support for V++ 1.0.0.0.
 To report bugs or request new feautures go to the Issues tab or [click here](https://github.com/vpp-lang/vppi/issues).
 
 For discussions/requesting a library/dependecy for the V++ package manager go to the discussions tab or [click here](https://github.com/vpp-lang/vppi/discussions).
+
+# Donation
+For donating click this link: https://link-to.net/337571/vppdonation.
+It is free, it does not cost you anything and it helps me develop V++ more.
