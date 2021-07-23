@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports Microsoft.Win32
 Imports System.Reflection
+Imports System.Security.Principal
 
 Public Class Form1
 
@@ -99,7 +100,29 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.BringToFront()
         cargs = My.Application.CommandLineArgs.ToList()
+        Try
+            Dim W_Id = WindowsIdentity.GetCurrent()
+            Dim WP = New WindowsPrincipal(W_Id)
+            Dim isAdmin As Boolean = WP.IsInRole(WindowsBuiltInRole.Administrator)
+            If isAdmin = False Then
+                Dim process As Process = Nothing
+                Dim processStartInfo As ProcessStartInfo
+                processStartInfo = New ProcessStartInfo()
+                processStartInfo.FileName = Application.ExecutablePath
+                processStartInfo.Verb = "runas"
+
+                processStartInfo.Arguments = stringa_to_string(My.Application.CommandLineArgs.ToArray())
+                processStartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
+                processStartInfo.UseShellExecute = True
+                process = Process.Start(processStartInfo)
+                End
+            End If
+        Catch ex As Exception
+            MsgBox("Failed to start setup with admin permissions. " + ex.Message, MsgBoxStyle.Critical, "V++ Setup")
+            End
+        End Try
         cargl = My.Application.CommandLineArgs.Count
         Label1.Text = "V++ will be installed in: " + getpff()
         Me.Text = "V++ " + My.Application.Info.Version.ToString + versub + " installer"
@@ -219,6 +242,20 @@ Public Class Form1
             Directory.CreateDirectory(path1)
         End If
         Return path1
+    End Function
+
+    Function stringa_to_string(_value As String(), Optional startip As Integer = 0) As String
+        Static tmpval_stra
+        Dim tmpip As Integer
+        tmpval_stra = ""
+        tmpip = 0
+        For Each i In _value
+            If tmpip >= startip Then
+                tmpval_stra += i + " "
+            End If
+            tmpip += 1
+        Next
+        Return tmpval_stra
     End Function
 
     Sub installvpp()

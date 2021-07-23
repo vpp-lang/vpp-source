@@ -2,10 +2,14 @@ C:\Users\MATEI\source\repos\vppsetup\vppsetup\bin\Debug\vppsetup.exe.config
 C:\Users\MATEI\source\repos\vppsetup\vppsetup\bin\Debug\vppsetup.exe
 C:\Users\MATEI\source\repos\vppsetup\vppsetup\bin\Debug\vppsetup.pdb
 C:\Users\MATEI\source\repos\vppsetup\vppsetup\bin\Debug\vppsetup.xml
-C:\Users\MATEI\source\repos\vppsetup\vppsetup\obj\Debug\vppsetup.vbprojAssemblyReference.cache
 C:\Users\MATEI\source\repos\vppsetup\vppsetup\obj\Debug\vppsetup.Form1.resources
 C:\Users\MATEI\source\repos\vppsetup\vppsetup\obj\Debug\vppsetup.Resources.resources
 C:\Users\MATEI\source\repos\vppsetup\vppsetup\obj\Debug\vppsetup.vbproj.GenerateResource.cache
 C:\Users\MATEI\source\repos\vppsetup\vppsetup\obj\Debug\vppsetup.exe
 C:\Users\MATEI\source\repos\vppsetup\vppsetup\obj\Debug\vppsetup.xml
 C:\Users\MATEI\source\repos\vppsetup\vppsetup\obj\Debug\vppsetup.pdb
+C:\Users\MATEI\source\repos\vppsetup\vppsetup\obj\Debug\vppsetup.exe.manifest
+C:\Users\MATEI\source\repos\vppsetup\vppsetup\bin\Debug\vppsetup.exe.manifest
+C:\Users\MATEI\source\repos\vppsetup\vppsetup\bin\Debug\vppsetup.application
+C:\Users\MATEI\source\repos\vppsetup\vppsetup\obj\Debug\vppsetup.application
+C:\Users\MATEI\source\repos\vppsetup\vppsetup\obj\Debug\vppsetup.vbprojAssemblyReference.cache

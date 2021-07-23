@@ -30,32 +30,53 @@ Public Class HTTPServer
     End Sub
 
     Sub requestWait(ByVal ar As IAsyncResult)
-        If Not http.IsListening Then
-            Return
-        End If
+        Dim TimerStart As DateTime
+        TimerStart = Now
+        Dim TimeSpent As System.TimeSpan
         Dim c = http.EndGetContext(ar)
         Dim responsestr = "hey"
         Dim responsecode = 400
+        Dim respbyte As Byte()
         http.BeginGetContext(AddressOf requestWait, Nothing)
-
-        out_reqev = True
-        out_req_url = c.Request.RawUrl
-
-        While in_didresp = False
-
-        End While
-
-        in_didresp = False
-
-        responsestr = in_resp_body
-        responsecode = in_resp_code
+        If Not http.IsListening Then
+            Return
+        End If
 
         c.Response.Headers("Server") = "vppi_ext_http HTTPServer: V++ " + My.Application.Info.Version.ToString
 
-        c.Response.StatusCode = responsecode
-        c.Response.ContentType = in_resp_type
-        c.Response.OutputStream.Write(System.Text.Encoding.Unicode.GetBytes(responsestr), 0, System.Text.Encoding.Unicode.GetBytes(responsestr).Length)
-        c.Response.Close()
-        Exit Sub
+        Try
+            out_reqev = True
+            out_req_url = c.Request.RawUrl
+
+            While in_didresp = False
+                TimeSpent = Now.Subtract(TimerStart)
+                If TimeSpent.TotalSeconds > 5 Then
+                    c.Response.StatusCode = 504
+                    c.Response.ContentType = "text/html"
+                    c.Response.ContentEncoding = Encoding.UTF8
+                    responsestr = "Script took too long to respond to HTTP request. [vppi_ext_http.HTTPServer]"
+                    c.Response.OutputStream.Write(System.Text.Encoding.UTF8.GetBytes(responsestr), 0, System.Text.Encoding.UTF8.GetBytes(responsestr).Length)
+                    c.Response.Close()
+                    Exit Sub
+                End If
+            End While
+
+            in_didresp = False
+
+            responsestr = in_resp_body
+            responsecode = in_resp_code
+
+            respbyte = System.Text.Encoding.UTF8.GetBytes(responsestr)
+            c.Response.StatusCode = responsecode
+            c.Response.SendChunked = True
+            c.Response.ContentEncoding = Encoding.UTF8
+            c.Response.ContentType = in_resp_type
+            c.Response.OutputStream.Write(respbyte, 0, respbyte.Length)
+            c.Response.Close()
+            Exit Sub
+        Catch ex As Exception
+
+        End Try
+
     End Sub
 End Class

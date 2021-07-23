@@ -14,6 +14,7 @@ Imports System.Runtime.InteropServices
 Imports vppi_ext_lui
 Imports vppi_ext_http
 Imports System.Security.Principal
+Imports System.Text
 
 ''' <summary>
 ''' The V++ interpreter class. Check https://github.com/VMGP/vppi/wiki.
@@ -288,24 +289,29 @@ Public Class VppInterpreter
             ElseIf sinsset(0) = "@EntryPoint" Then
                 nf = sinsset(1)
             ElseIf sinsset(0) = "@RequireAdmin" Then
-                Dim W_Id = WindowsIdentity.GetCurrent()
-                Dim WP = New WindowsPrincipal(W_Id)
-                Dim isAdmin As Boolean = WP.IsInRole(WindowsBuiltInRole.Administrator)
-                If isAdmin = False Then
-                    didsetup = True
-                    canexec = False
-                    Dim process As Process = Nothing
-                    Dim processStartInfo As ProcessStartInfo
-                    processStartInfo = New ProcessStartInfo()
-                    processStartInfo.FileName = Application.ExecutablePath
-                    processStartInfo.Verb = "runas"
+                Try
+                    Dim W_Id = WindowsIdentity.GetCurrent()
+                    Dim WP = New WindowsPrincipal(W_Id)
+                    Dim isAdmin As Boolean = WP.IsInRole(WindowsBuiltInRole.Administrator)
+                    If isAdmin = False Then
+                        didsetup = True
+                        canexec = False
+                        Dim process As Process = Nothing
+                        Dim processStartInfo As ProcessStartInfo
+                        processStartInfo = New ProcessStartInfo()
+                        processStartInfo.FileName = Application.ExecutablePath
+                        processStartInfo.Verb = "runas"
 
-                    processStartInfo.Arguments = stringa_to_string(My.Application.CommandLineArgs.ToArray())
-                    processStartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
-                    processStartInfo.UseShellExecute = True
-                    process = Process.Start(processStartInfo)
+                        processStartInfo.Arguments = stringa_to_string(My.Application.CommandLineArgs.ToArray())
+                        processStartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
+                        processStartInfo.UseShellExecute = True
+                        process = Process.Start(processStartInfo)
+                        End
+                    End If
+                Catch ex As Exception
+                    MsgBox("This script requires admin. Failed to start the script with administrator permissions. " + ex.Message, MsgBoxStyle.Critical, "V++")
                     End
-                End If
+                End Try
             ElseIf sinsset(0) = "@Include" Then
                 include(sinsset(1))
             ElseIf sinsset(0) = "@EnvironmentPath" Then
@@ -1681,22 +1687,42 @@ Public Class VppInterpreter
                     Else
                         atmpval1 = parameters(1)
                     End If
+                    If objects.ContainsKey(parameters(3)) Then
+                        atmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
+                    Else
+                        atmpval2 = vppstring_to_string(parameters(3))
+                    End If
+                    If objects.ContainsKey(parameters(2)) Then
+                        atmpval5 = objects(vppstring_to_string(parameters(2))).value.ToString
+                        atmpval7 = atmpval5.Remove(atmpval5.Length - 2, 1)
+                        atmpval3 = atmpval7.ToString.Remove(0, 1)
+                    Else
+                        atmpval3 = vppstring_to_string(parameters(2))
+                    End If
+                    webserverclass.in_resp_code = Convert.ToDecimal(atmpval1)
+                    webserverclass.in_resp_body = atmpval3
+                    webserverclass.in_resp_type = atmpval2
+                    webserverclass.in_didresp = True
+                Catch ex As Exception
+                    exceptionmsg("Failed to send response." + ex.Message + ex.StackTrace, "i_0001")
+                End Try
+            ElseIf parameters(0) = "0x002E" Then
+                Try
+                    If objects.ContainsKey(parameters(1)) Then
+                        atmpval1 = objects(vppstring_to_string(parameters(1))).value
+                    Else
+                        atmpval1 = parameters(1)
+                    End If
                     If objects.ContainsKey(parameters(2)) Then
                         atmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
                     Else
                         atmpval2 = vppstring_to_string(parameters(2))
                     End If
-                    If objects.ContainsKey(parameters(3)) Then
-                        atmpval3 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
-                    Else
-                        atmpval3 = vppstring_to_string(parameters(3))
-                    End If
                     webserverclass.in_resp_code = Convert.ToDecimal(atmpval1)
-                    webserverclass.in_resp_body = atmpval2
-                    webserverclass.in_resp_type = atmpval3
+                    webserverclass.in_resp_body = File.ReadAllText(atmpval2)
                     webserverclass.in_didresp = True
                 Catch ex As Exception
-                    exceptionmsg("Failed to send response.", "i_0001")
+                    exceptionmsg("Failed to send response." + ex.Message + ex.StackTrace, "i_0001")
                 End Try
             ElseIf parameters(0) = "0x0050" Then
                 If objects.ContainsKey(parameters(1)) Then
@@ -2195,6 +2221,12 @@ Public Class VppInterpreter
             End If
         End If
     End Sub
+
+    Public Function ReadFile(filePath As String) As String
+        Using sr As New StreamReader(filePath, True)
+            Return sr.ReadToEnd()
+        End Using
+    End Function
 #End Region
 
 End Class

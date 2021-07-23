@@ -8,3 +8,7 @@ C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.vbproj.GenerateResource.
 C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.exe
 C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.xml
 C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.pdb
+C:\Users\MATEI\source\repos\vpppm\vpppm\bin\Debug\vpppm.exe.manifest
+C:\Users\MATEI\source\repos\vpppm\vpppm\bin\Debug\vpppm.application
+C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.exe.manifest
+C:\Users\MATEI\source\repos\vpppm\vpppm\obj\Debug\vpppm.application

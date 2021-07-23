@@ -1,9 +1,9 @@
 C:\Users\MATEI\source\repos\vppi\vppi_ext_lui\bin\Debug\vppi_ext_lui.dll
 C:\Users\MATEI\source\repos\vppi\vppi_ext_lui\bin\Debug\vppi_ext_lui.pdb
 C:\Users\MATEI\source\repos\vppi\vppi_ext_lui\bin\Debug\vppi_ext_lui.xml
-C:\Users\MATEI\source\repos\vppi\vppi_ext_lui\obj\Debug\vppi_ext_lui.vbprojAssemblyReference.cache
 C:\Users\MATEI\source\repos\vppi\vppi_ext_lui\obj\Debug\vppi_ext_lui.Resources.resources
 C:\Users\MATEI\source\repos\vppi\vppi_ext_lui\obj\Debug\vppi_ext_lui.vbproj.GenerateResource.cache
 C:\Users\MATEI\source\repos\vppi\vppi_ext_lui\obj\Debug\vppi_ext_lui.dll
 C:\Users\MATEI\source\repos\vppi\vppi_ext_lui\obj\Debug\vppi_ext_lui.xml
 C:\Users\MATEI\source\repos\vppi\vppi_ext_lui\obj\Debug\vppi_ext_lui.pdb
+C:\Users\MATEI\source\repos\vppi\vppi_ext_lui\obj\Debug\vppi_ext_lui.vbprojAssemblyReference.cache
