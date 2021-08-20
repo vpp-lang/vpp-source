@@ -17,5 +17,6 @@ C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi_ext_lui.xml
 C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.vbproj.CopyComplete
 C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi.exe.manifest
 C:\Users\MATEI\source\repos\vppi\vppi\bin\Debug\vppi.application
+C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.TrustInfo.xml
 C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.exe.manifest
 C:\Users\MATEI\source\repos\vppi\vppi\obj\Debug\vppi.application

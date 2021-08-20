@@ -10,7 +10,7 @@
   <trustInfo>
     <security>
       <applicationRequestMinimum>
-        <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
+        <PermissionSet version="1" class="System.Security.NamedPermissionSet" Name="LocalIntranet" Description="Default rights given to applications on the local intranet" Unrestricted="true" ID="Custom" SameSite="site" />
         <defaultAssemblyRequest permissionSetReference="Custom" />
       </applicationRequestMinimum>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
@@ -50,7 +50,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>N9nw09CUuM+NLeMmcN9ekfgbQdbDWsZlS0hQjU5K3iQ=</dsig:DigestValue>
+        <dsig:DigestValue>KFpIWqrj3Q9vSmiGB4u6H18AxT3gJ4aTPb9HRx1vRcE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -62,7 +62,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>GG1PoV1xvfck5JydjRsqQg8phs7q/esRpeaaqhKTbwg=</dsig:DigestValue>
+        <dsig:DigestValue>OH4eyOKC5+rgXzCdnX98utwKsgbR0LzbaLWl4mxtxpo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

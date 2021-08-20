@@ -42,6 +42,7 @@ Public Class HTTPServer
             Return
         End If
 
+        c.Response.Headers.Add("Access-Control-Allow-Origin", "*")
         c.Response.Headers("Server") = "vppi_ext_http HTTPServer: V++ " + My.Application.Info.Version.ToString
 
         Try

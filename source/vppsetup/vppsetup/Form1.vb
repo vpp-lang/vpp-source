@@ -10,7 +10,7 @@ Public Class Form1
     Dim cargs As List(Of String)
     Dim state = 0
     Dim vai = False
-    Dim versub = ""
+    Dim versub = "a"
     Dim prerelease = False
 
     Dim pathseparator = Path.DirectorySeparatorChar

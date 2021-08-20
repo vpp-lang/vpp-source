@@ -155,7 +155,7 @@ Module Module1
         If File.Exists(vconsoleinput) Then
             newinterpreter(vconsoleinput)
         ElseIf vconsoleinput = "exit" Then
-            End
+            Environment.Exit(255)
         Else
             Console.WriteLine("Invalid file name.")
         End If

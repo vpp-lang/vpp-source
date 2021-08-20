@@ -72,6 +72,7 @@ Public Class VppInterpreter
     Private tmpip = 0 'temp pointer 1
     Private tmpip1 = 0 'temp pointer 2
     Private tmpip2 = -1 'temp pointer 3
+    Private strpip = 0 'temp pointer 3
 
     Private tmpval = Nothing 'temp value
     Private tmpval1 = Nothing 'temp value 1
@@ -302,7 +303,7 @@ Public Class VppInterpreter
                         processStartInfo.FileName = Application.ExecutablePath
                         processStartInfo.Verb = "runas"
 
-                        processStartInfo.Arguments = stringa_to_string(My.Application.CommandLineArgs.ToArray())
+                        processStartInfo.Arguments = Join(My.Application.CommandLineArgs.ToArray(), " ")
                         processStartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
                         processStartInfo.UseShellExecute = True
                         process = Process.Start(processStartInfo)
@@ -393,8 +394,8 @@ Public Class VppInterpreter
                     teststring = ""
                 End Try
 
-                If teststring.Contains("int") Then
-                    teststring.Replace("int", "number")
+                If teststring.Contains(" int ") Then
+                    teststring.Replace(" int ", " number ")
                     exceptionmsg("The ""int"" type is deprecated. Please use ""number"" instead.", "g_0005", 1)
                 End If
 
@@ -448,7 +449,7 @@ Public Class VppInterpreter
         insset = _insset
         insset(0) = removeun(_insset(0))
 
-        log("[" + DateTime.Now.ToString + "]: " + "Interpreting line " + ip.ToString + ". Contents: " + Chr(34) + stringa_to_string(insset) + Chr(34))
+        log("[" + DateTime.Now.ToString + "]: " + "Interpreting line " + ip.ToString + ". Contents: " + Chr(34) + Join(insset, " ") + Chr(34))
 
         'Function executing
         If cf = nf Then
@@ -584,7 +585,7 @@ Public Class VppInterpreter
             If exitsetup Then
                 Console.WriteLine("Press any key...")
                 Console.Read()
-                End
+                Environment.Exit(255)
             Else
                 Console.WriteLine()
                 canexec = True
@@ -592,7 +593,7 @@ Public Class VppInterpreter
         Else
             Console.WriteLine("Press any key...")
             Console.Read()
-            End
+            Environment.Exit(255)
         End If
     End Sub
 
@@ -1139,7 +1140,7 @@ Public Class VppInterpreter
                         exceptionmsg("Could not find/access " + vaparameters(1), "d_0001", 1)
                     End If
                 Catch ex As Exception
-                    exceptionmsg("Internal exception: " + ex.Message, "c_0002")
+                    exceptionmsg("Internal exception: " + ex.Message + ex.StackTrace, "c_0002")
                 End Try
             ElseIf vaparameters(0) = "0x0002" Then
                 'Converts bool/int to string
@@ -1247,11 +1248,11 @@ Public Class VppInterpreter
         tmpval = Nothing
         If stringval(2) = "as" Then
             If gettypefromval(stringval(1)) = "number" Then
-                exceptionmsg("Failed to define variable.", "d_0001")
+                exceptionmsg("Invalid syntax.", "g_0001")
             ElseIf gettypefromval(stringval(1)) = "string" Then
-                exceptionmsg("Failed to define variable.", "d_0001")
+                exceptionmsg("Invalid syntax.", "g_0001")
             ElseIf gettypefromval(stringval(1)) = "bool" Then
-                exceptionmsg("Failed to define variable.", "d_0001")
+                exceptionmsg("Invalid syntax.", "g_0001")
             Else
                 If stringval(3) = "string" Then
                     If stringval(4) = "=" Then
@@ -1300,100 +1301,100 @@ Public Class VppInterpreter
             Exit Sub
         End If
         Try
-            Static parameters As String()
-            parameters = parsearguments(stringval, 1)
-            log("[" + DateTime.Now.ToString + "]: Command requested. cmdid: " + Chr(34) + parameters(0) + Chr(34) + " args: " + Chr(34) + stringa_to_string(parameters, 1) + Chr(34))
-            If parameters(0) = "0x0001" Then
-                If objects.ContainsKey(vppstring_to_string(parameters(1))) Then
-                    Console.Title = objects(parameters(1)).value
+            Static cparameters As String()
+            cparameters = parsearguments(stringval, 1)
+            log("[" + DateTime.Now.ToString + "]: Command requested. cmdid: " + Chr(34) + cparameters(0) + Chr(34) + " args: " + Chr(34) + stringa_to_string(cparameters, 1) + Chr(34))
+            If cparameters(0) = "0x0001" Then
+                If objects.ContainsKey(vppstring_to_string(cparameters(1))) Then
+                    Console.Title = objects(cparameters(1)).value
                 Else
-                    Console.Title = vppstring_to_string(parameters(1))
+                    Console.Title = vppstring_to_string(cparameters(1))
                 End If
-            ElseIf parameters(0) = "0x0002" Then
-                Console.SetCursorPosition(Convert.ToDecimal(parameters(1)), Convert.ToDecimal(parameters(2)))
-            ElseIf parameters(0) = "0x0003" Then
+            ElseIf cparameters(0) = "0x0002" Then
+                Console.SetCursorPosition(Convert.ToDecimal(cparameters(1)), Convert.ToDecimal(cparameters(2)))
+            ElseIf cparameters(0) = "0x0003" Then
                 Console.Clear()
-            ElseIf parameters(0) = "0x0004" Then
-                If objects.ContainsKey(vppstring_to_string(parameters(1))) Then
-                    Console.Write(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+            ElseIf cparameters(0) = "0x0004" Then
+                If objects.ContainsKey(vppstring_to_string(cparameters(1))) Then
+                    Console.Write(vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value))
                 Else
-                    Console.Write(vppstring_to_string(parameters(1)))
+                    Console.Write(vppstring_to_string(cparameters(1)))
                 End If
-            ElseIf parameters(0) = "0x0005" Then
-                If objects.ContainsKey(vppstring_to_string(parameters(1))) Then
-                    Console.WriteLine(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+            ElseIf cparameters(0) = "0x0005" Then
+                If objects.ContainsKey(vppstring_to_string(cparameters(1))) Then
+                    Console.WriteLine(vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value))
                 Else
-                    Console.WriteLine(vppstring_to_string(parameters(1)))
+                    Console.WriteLine(vppstring_to_string(cparameters(1)))
                 End If
-            ElseIf parameters(0) = "0x0006" Then
+            ElseIf cparameters(0) = "0x0006" Then
                 canexec = False
                 Console.Read()
-            ElseIf parameters(0) = "0x0007" Then
+            ElseIf cparameters(0) = "0x0007" Then
                 canexec = False
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = Chr(34) + Console.ReadLine() + Chr(34)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        objects(cparameters(1)).value = Chr(34) + Console.ReadLine() + Chr(34)
                     Else
 
                     End If
                 Catch ex As Exception
 
                 End Try
-            ElseIf parameters(0) = "0x0008" Then
+            ElseIf cparameters(0) = "0x0008" Then
                 canexec = False
-                MsgBox(vppstring_to_string(parameters(1)))
-            ElseIf parameters(0) = "0x000A" Then
-                If gettypefromval(parameters(1)) = "number" Then
-                    Console.ForegroundColor = Convert.ToDecimal(parameters(1))
+                MsgBox(vppstring_to_string(cparameters(1)))
+            ElseIf cparameters(0) = "0x000A" Then
+                If gettypefromval(cparameters(1)) = "number" Then
+                    Console.ForegroundColor = Convert.ToDecimal(cparameters(1))
                 Else
-                    If objects.ContainsKey(parameters(1)) Then
-                        Console.ForegroundColor = Convert.ToDecimal(objects(parameters(1)).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        Console.ForegroundColor = Convert.ToDecimal(objects(cparameters(1)).value)
                     End If
                 End If
-            ElseIf parameters(0) = "0x000B" Then
-                If gettypefromval(parameters(1)) = "number" Then
-                    Console.BackgroundColor = Convert.ToDecimal(parameters(1))
+            ElseIf cparameters(0) = "0x000B" Then
+                If gettypefromval(cparameters(1)) = "number" Then
+                    Console.BackgroundColor = Convert.ToDecimal(cparameters(1))
                 Else
-                    If objects.ContainsKey(parameters(1)) Then
-                        Console.BackgroundColor = Convert.ToDecimal(objects(parameters(1)).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        Console.BackgroundColor = Convert.ToDecimal(objects(cparameters(1)).value)
                     End If
                 End If
-            ElseIf parameters(0) = "0x000C" Then
+            ElseIf cparameters(0) = "0x000C" Then
                 Beep()
-            ElseIf parameters(0) = "0x000D" Then
-                If gettypefromval(parameters(1)) = "number" Then
-                    ip = Convert.ToDecimal(parameters(1))
+            ElseIf cparameters(0) = "0x000D" Then
+                If gettypefromval(cparameters(1)) = "number" Then
+                    ip = Convert.ToDecimal(cparameters(1))
                 Else
-                    If objects.ContainsKey(parameters(1)) Then
-                        ip = Convert.ToDecimal(objects(parameters(1)).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        ip = Convert.ToDecimal(objects(cparameters(1)).value)
                     End If
                 End If
-            ElseIf parameters(0) = "0x000F" Then
-                If gettypefromval(parameters(1)) = "string" Then
+            ElseIf cparameters(0) = "0x000F" Then
+                If gettypefromval(cparameters(1)) = "string" Then
                     canexec = False
-                    exceptionmsg(parameters(1), "g_0004")
+                    exceptionmsg(cparameters(1), "g_0004")
                 Else
-                    If objects.ContainsKey(parameters(1)) Then
-                        exceptionmsg(parameters(1), vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                    If objects.ContainsKey(cparameters(1)) Then
+                        exceptionmsg(cparameters(1), vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value))
                     End If
                 End If
-            ElseIf parameters(0) = "0x0010" Then
-                If objects.ContainsKey(parameters(1)) Then
+            ElseIf cparameters(0) = "0x0010" Then
+                If objects.ContainsKey(cparameters(1)) Then
                     canexec = False
-                    objects(parameters(1)).value = Chr(34) + InputBox(vppstring_to_string(parameters(2))) + Chr(34)
+                    objects(cparameters(1)).value = Chr(34) + InputBox(vppstring_to_string(cparameters(2))) + Chr(34)
                 Else
 
                 End If
-            ElseIf parameters(0) = "0x0011" Then
+            ElseIf cparameters(0) = "0x0011" Then
                 Try
-                    If objects.ContainsKey(parameters(2)) Then
-                        atmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value).Replace(" ", "")
+                    If objects.ContainsKey(cparameters(2)) Then
+                        atmpval2 = vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value).Replace(" ", "")
                     Else
-                        atmpval2 = vppstring_to_string(parameters(2))
+                        atmpval2 = vppstring_to_string(cparameters(2))
                     End If
-                    If objects.ContainsKey(parameters(1)) Then
+                    If objects.ContainsKey(cparameters(1)) Then
                         If File.Exists(atmpval2) Then
-                            objects(parameters(1)).value = Chr(34) + File.ReadAllText(atmpval2) + Chr(34)
+                            objects(cparameters(1)).value = Chr(34) + File.ReadAllText(atmpval2) + Chr(34)
                         End If
                     Else
 
@@ -1401,123 +1402,123 @@ Public Class VppInterpreter
                 Catch ex As Exception
                     exceptionmsg("Failed to access file.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x0012" Then
+            ElseIf cparameters(0) = "0x0012" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        My.Computer.FileSystem.WriteAllText(vppstring_to_string(parameters(2)), vppstring_to_string(objects(vppstring_to_string(parameters(1))).value), False)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        My.Computer.FileSystem.WriteAllText(vppstring_to_string(cparameters(2)), vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value), False)
                     Else
-                        My.Computer.FileSystem.WriteAllText(vppstring_to_string(parameters(2)), vppstring_to_string(parameters(1)), False)
+                        My.Computer.FileSystem.WriteAllText(vppstring_to_string(cparameters(2)), vppstring_to_string(cparameters(1)), False)
                     End If
                 Catch ex As Exception
                     exceptionmsg("Failed to access file.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x0013" Then
+            ElseIf cparameters(0) = "0x0013" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        Shell(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                    If objects.ContainsKey(cparameters(1)) Then
+                        Shell(vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value))
                     Else
-                        Shell(vppstring_to_string(parameters(1)))
+                        Shell(vppstring_to_string(cparameters(1)))
                     End If
                 Catch ex As Exception
                     exceptionmsg("General exception.", "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x0014" Then
+            ElseIf cparameters(0) = "0x0014" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = My.Application.Info.Version.Major.ToString()
+                    If objects.ContainsKey(cparameters(1)) Then
+                        objects(cparameters(1)).value = My.Application.Info.Version.Major.ToString()
                     Else
 
                     End If
                 Catch ex As Exception
                     exceptionmsg("General exception.", "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x0016" Then
+            ElseIf cparameters(0) = "0x0016" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = My.Application.Info.Version.MajorRevision.ToString()
+                    If objects.ContainsKey(cparameters(1)) Then
+                        objects(cparameters(1)).value = My.Application.Info.Version.MajorRevision.ToString()
                     Else
 
                     End If
                 Catch ex As Exception
                     exceptionmsg("General exception.", "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x0017" Then
+            ElseIf cparameters(0) = "0x0017" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = My.Application.Info.Version.Minor.ToString()
+                    If objects.ContainsKey(cparameters(1)) Then
+                        objects(cparameters(1)).value = My.Application.Info.Version.Minor.ToString()
                     Else
 
                     End If
                 Catch ex As Exception
                     exceptionmsg("General exception.", "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x0018" Then
+            ElseIf cparameters(0) = "0x0018" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = My.Application.Info.Version.MinorRevision.ToString()
+                    If objects.ContainsKey(cparameters(1)) Then
+                        objects(cparameters(1)).value = My.Application.Info.Version.MinorRevision.ToString()
                     Else
 
                     End If
                 Catch ex As Exception
                     exceptionmsg("General exception.", "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x0019" Then
+            ElseIf cparameters(0) = "0x0019" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = My.Application.Info.Version.ToString()
+                    If objects.ContainsKey(cparameters(1)) Then
+                        objects(cparameters(1)).value = My.Application.Info.Version.ToString()
                     Else
 
                     End If
                 Catch ex As Exception
                     exceptionmsg("General exception.", "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x001A" Then
+            ElseIf cparameters(0) = "0x001A" Then
                 Try
-                    If objects.ContainsKey(parameters(2)) Then
-                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value).Replace(" ", "")
+                    If objects.ContainsKey(cparameters(2)) Then
+                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value).Replace(" ", "")
                     Else
-                        tmpval2 = vppstring_to_string(parameters(2))
+                        tmpval2 = vppstring_to_string(cparameters(2))
                     End If
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = Chr(34) + webreqclass.webreq(tmpval2) + Chr(34)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        objects(cparameters(1)).value = Chr(34) + webreqclass.webreq(tmpval2) + Chr(34)
                     Else
 
                     End If
                 Catch ex As Exception
                     exceptionmsg("General exception. " + ex.Message, "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x001B" Then
+            ElseIf cparameters(0) = "0x001B" Then
                 Try
                     canexec = False
-                    If objects.ContainsKey(parameters(2)) Then
-                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value).Replace(" ", "")
+                    If objects.ContainsKey(cparameters(2)) Then
+                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value).Replace(" ", "")
                     Else
-                        tmpval2 = vppstring_to_string(parameters(2))
+                        tmpval2 = vppstring_to_string(cparameters(2))
                     End If
-                    If objects.ContainsKey(parameters(3)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
+                    If objects.ContainsKey(cparameters(3)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(3))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(3))
+                        tmpval1 = vppstring_to_string(cparameters(3))
                     End If
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = Chr(34) + webreqclass.webreq(tmpval2, tmpval1, parameters(4)) + Chr(34)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        objects(cparameters(1)).value = Chr(34) + webreqclass.webreq(tmpval2, tmpval1, cparameters(4)) + Chr(34)
                     Else
 
                     End If
                 Catch ex As Exception
                     exceptionmsg("General exception. " + ex.Message, "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x001C" Then
+            ElseIf cparameters(0) = "0x001C" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value)
                     Else
-                        tmpval2 = vppstring_to_string(parameters(1))
+                        tmpval2 = vppstring_to_string(cparameters(1))
                     End If
-                    If objects.ContainsKey(parameters(2)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    If objects.ContainsKey(cparameters(2)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(2))
+                        tmpval1 = vppstring_to_string(cparameters(2))
                     End If
                     If webreqclass.webheaders.ContainsKey(tmpval2) Then
                         webreqclass.webheaders(tmpval2) = tmpval1
@@ -1527,177 +1528,177 @@ Public Class VppInterpreter
                 Catch ex As Exception
                     exceptionmsg("General exception. " + ex.Message, "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x001D" Then
+            ElseIf cparameters(0) = "0x001D" Then
                 Try
                     webreqclass.webheaders.Clear()
                 Catch ex As Exception
                     exceptionmsg("General exception. " + ex.Message, "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x001F" Then
+            ElseIf cparameters(0) = "0x001F" Then
                 Try
                     canexec = False
-                    If objects.ContainsKey(parameters(1)) Then
-                        My.Computer.Audio.Play(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value), AudioPlayMode.Background)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        My.Computer.Audio.Play(vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value), AudioPlayMode.Background)
                     Else
-                        My.Computer.Audio.Play(vppstring_to_string(parameters(1)), AudioPlayMode.Background)
+                        My.Computer.Audio.Play(vppstring_to_string(cparameters(1)), AudioPlayMode.Background)
                     End If
                 Catch ex As Exception
                     exceptionmsg("General exception.", "g_0003")
                 End Try
-            ElseIf parameters(0) = "0x0020" Then
+            ElseIf cparameters(0) = "0x0020" Then
                 ShowWindow(GetConsoleWindow(), 0)
-            ElseIf parameters(0) = "0x0021" Then
+            ElseIf cparameters(0) = "0x0021" Then
                 ShowWindow(GetConsoleWindow(), 1)
-            ElseIf parameters(0) = "0x0023" Then
+            ElseIf cparameters(0) = "0x0023" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        Directory.CreateDirectory(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                    If objects.ContainsKey(cparameters(1)) Then
+                        Directory.CreateDirectory(vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value))
                     Else
-                        Directory.CreateDirectory(vppstring_to_string(parameters(1)))
+                        Directory.CreateDirectory(vppstring_to_string(cparameters(1)))
                     End If
                 Catch ex As Exception
                     exceptionmsg("Failed to create directory.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x0024" Then
+            ElseIf cparameters(0) = "0x0024" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(1))
+                        tmpval1 = vppstring_to_string(cparameters(1))
                     End If
                     File.Delete(tmpval1)
                 Catch ex As Exception
                     exceptionmsg("Failed to delete file.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x0025" Then
+            ElseIf cparameters(0) = "0x0025" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(1))
+                        tmpval1 = vppstring_to_string(cparameters(1))
                     End If
                     Directory.Delete(tmpval1)
                 Catch ex As Exception
                     exceptionmsg("Failed to delete directory.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x0026" Then
+            ElseIf cparameters(0) = "0x0026" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(1))
+                        tmpval1 = vppstring_to_string(cparameters(1))
                     End If
-                    If objects.ContainsKey(parameters(2)) Then
-                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    If objects.ContainsKey(cparameters(2)) Then
+                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value)
                     Else
-                        tmpval2 = vppstring_to_string(parameters(2))
+                        tmpval2 = vppstring_to_string(cparameters(2))
                     End If
                     My.Computer.FileSystem.RenameFile(tmpval1, tmpval2)
                 Catch ex As Exception
                     exceptionmsg("Failed to rename file.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x0027" Then
+            ElseIf cparameters(0) = "0x0027" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(1))
+                        tmpval1 = vppstring_to_string(cparameters(1))
                     End If
-                    If objects.ContainsKey(parameters(2)) Then
-                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    If objects.ContainsKey(cparameters(2)) Then
+                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value)
                     Else
-                        tmpval2 = vppstring_to_string(parameters(2))
+                        tmpval2 = vppstring_to_string(cparameters(2))
                     End If
                     My.Computer.FileSystem.RenameDirectory(tmpval1, tmpval2)
                 Catch ex As Exception
                     exceptionmsg("Failed to rename directory.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x0028" Then
+            ElseIf cparameters(0) = "0x0028" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(1))
+                        tmpval1 = vppstring_to_string(cparameters(1))
                     End If
                     Directory.CreateDirectory(tmpval1)
                 Catch ex As Exception
                     exceptionmsg("Failed to create directory.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x0029" Then
+            ElseIf cparameters(0) = "0x0029" Then
                 Try
-                    If objects.ContainsKey(parameters(2)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    If objects.ContainsKey(cparameters(2)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(2))
+                        tmpval1 = vppstring_to_string(cparameters(2))
                     End If
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = bool_to_string(File.Exists(tmpval1))
+                    If objects.ContainsKey(cparameters(1)) Then
+                        objects(cparameters(1)).value = bool_to_string(File.Exists(tmpval1))
                     Else
                         exceptionmsg("Failed to access variable.", "d_0001")
                     End If
                 Catch ex As Exception
                     exceptionmsg("Failed to access file.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x002A" Then
+            ElseIf cparameters(0) = "0x002A" Then
                 Try
-                    If objects.ContainsKey(parameters(2)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    If objects.ContainsKey(cparameters(2)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(2))
+                        tmpval1 = vppstring_to_string(cparameters(2))
                     End If
-                    If objects.ContainsKey(parameters(1)) Then
-                        objects(parameters(1)).value = bool_to_string(Directory.Exists(tmpval1))
+                    If objects.ContainsKey(cparameters(1)) Then
+                        objects(cparameters(1)).value = bool_to_string(Directory.Exists(tmpval1))
                     Else
                         exceptionmsg("Failed to access variable.", "d_0001")
                     End If
                 Catch ex As Exception
                     exceptionmsg("Failed to access file.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x002B" Then
+            ElseIf cparameters(0) = "0x002B" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        tmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value)
                     Else
-                        tmpval1 = vppstring_to_string(parameters(1))
+                        tmpval1 = vppstring_to_string(cparameters(1))
                     End If
-                    If objects.ContainsKey(parameters(2)) Then
-                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    If objects.ContainsKey(cparameters(2)) Then
+                        tmpval2 = vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value)
                     Else
-                        tmpval2 = vppstring_to_string(parameters(2))
+                        tmpval2 = vppstring_to_string(cparameters(2))
                     End If
                     webreqclass.downloadfile(tmpval1, tmpval2)
                 Catch ex As Exception
                     exceptionmsg("Failed to rename file.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x002C" Then
+            ElseIf cparameters(0) = "0x002C" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        atmpval1 = vppstring_to_string(objects(vppstring_to_string(parameters(1))).value)
+                    If objects.ContainsKey(cparameters(1)) Then
+                        atmpval1 = vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value)
                     Else
-                        atmpval1 = vppstring_to_string(parameters(1))
+                        atmpval1 = vppstring_to_string(cparameters(1))
                     End If
                     webserverclass = New HTTPServer(atmpval1)
                 Catch ex As Exception
                     exceptionmsg("Failed to start webserver.", "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x002D" Then
+            ElseIf cparameters(0) = "0x002D" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        atmpval1 = objects(vppstring_to_string(parameters(1))).value
+                    If objects.ContainsKey(cparameters(1)) Then
+                        atmpval1 = objects(vppstring_to_string(cparameters(1))).value
                     Else
-                        atmpval1 = parameters(1)
+                        atmpval1 = cparameters(1)
                     End If
-                    If objects.ContainsKey(parameters(3)) Then
-                        atmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
+                    If objects.ContainsKey(cparameters(3)) Then
+                        atmpval2 = vppstring_to_string(objects(vppstring_to_string(cparameters(3))).value)
                     Else
-                        atmpval2 = vppstring_to_string(parameters(3))
+                        atmpval2 = vppstring_to_string(cparameters(3))
                     End If
-                    If objects.ContainsKey(parameters(2)) Then
-                        atmpval5 = objects(vppstring_to_string(parameters(2))).value.ToString
+                    If objects.ContainsKey(cparameters(2)) Then
+                        atmpval5 = objects(vppstring_to_string(cparameters(2))).value.ToString
                         atmpval7 = atmpval5.Remove(atmpval5.Length - 2, 1)
                         atmpval3 = atmpval7.ToString.Remove(0, 1)
                     Else
-                        atmpval3 = vppstring_to_string(parameters(2))
+                        atmpval3 = vppstring_to_string(cparameters(2))
                     End If
                     webserverclass.in_resp_code = Convert.ToDecimal(atmpval1)
                     webserverclass.in_resp_body = atmpval3
@@ -1706,17 +1707,17 @@ Public Class VppInterpreter
                 Catch ex As Exception
                     exceptionmsg("Failed to send response." + ex.Message + ex.StackTrace, "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x002E" Then
+            ElseIf cparameters(0) = "0x002E" Then
                 Try
-                    If objects.ContainsKey(parameters(1)) Then
-                        atmpval1 = objects(vppstring_to_string(parameters(1))).value
+                    If objects.ContainsKey(cparameters(1)) Then
+                        atmpval1 = objects(vppstring_to_string(cparameters(1))).value
                     Else
-                        atmpval1 = parameters(1)
+                        atmpval1 = cparameters(1)
                     End If
-                    If objects.ContainsKey(parameters(2)) Then
-                        atmpval2 = vppstring_to_string(objects(vppstring_to_string(parameters(2))).value)
+                    If objects.ContainsKey(cparameters(2)) Then
+                        atmpval2 = vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value)
                     Else
-                        atmpval2 = vppstring_to_string(parameters(2))
+                        atmpval2 = vppstring_to_string(cparameters(2))
                     End If
                     webserverclass.in_resp_code = Convert.ToDecimal(atmpval1)
                     webserverclass.in_resp_body = File.ReadAllText(atmpval2)
@@ -1724,142 +1725,142 @@ Public Class VppInterpreter
                 Catch ex As Exception
                     exceptionmsg("Failed to send response." + ex.Message + ex.StackTrace, "i_0001")
                 End Try
-            ElseIf parameters(0) = "0x0050" Then
-                If objects.ContainsKey(parameters(1)) Then
-                    tmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+            ElseIf cparameters(0) = "0x0050" Then
+                If objects.ContainsKey(cparameters(1)) Then
+                    tmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value))
                 Else
-                    tmpval1 = Convert.ToDecimal(vppstring_to_string(parameters(1)))
+                    tmpval1 = Convert.ToDecimal(vppstring_to_string(cparameters(1)))
                 End If
-                If objects.ContainsKey(parameters(2)) Then
-                    tmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(2))).value))
+                If objects.ContainsKey(cparameters(2)) Then
+                    tmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value))
                 Else
-                    tmpval2 = Convert.ToDecimal(vppstring_to_string(parameters(2)))
+                    tmpval2 = Convert.ToDecimal(vppstring_to_string(cparameters(2)))
                 End If
-                If objects.ContainsKey(parameters(3)) Then
-                    tmpval3 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
+                If objects.ContainsKey(cparameters(3)) Then
+                    tmpval3 = vppstring_to_string(objects(vppstring_to_string(cparameters(3))).value)
                 Else
-                    tmpval3 = vppstring_to_string(parameters(3))
+                    tmpval3 = vppstring_to_string(cparameters(3))
                 End If
                 If config("vppi_allow_gui") Then
                     guiwindow = New WindowUIManager(New Drawing.Size(tmpval1, tmpval2), tmpval3, My.Resources.newvpplogo)
                 End If
-            ElseIf parameters(0) = "0x0051" Then
+            ElseIf cparameters(0) = "0x0051" Then
                 'Coordinates
-                If objects.ContainsKey(parameters(1)) Then
-                    atmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                If objects.ContainsKey(cparameters(1)) Then
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value))
                 Else
-                    atmpval1 = Convert.ToDecimal(vppstring_to_string(parameters(1)))
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(cparameters(1)))
                 End If
-                If objects.ContainsKey(parameters(2)) Then
-                    atmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(2))).value))
+                If objects.ContainsKey(cparameters(2)) Then
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value))
                 Else
-                    atmpval2 = Convert.ToDecimal(vppstring_to_string(parameters(2)))
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(cparameters(2)))
                 End If
-                If objects.ContainsKey(parameters(3)) Then
-                    atmpval3 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(3))).value))
+                If objects.ContainsKey(cparameters(3)) Then
+                    atmpval3 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(3))).value))
                 Else
-                    atmpval3 = Convert.ToDecimal(vppstring_to_string(parameters(3)))
+                    atmpval3 = Convert.ToDecimal(vppstring_to_string(cparameters(3)))
                 End If
-                If objects.ContainsKey(parameters(4)) Then
-                    atmpval4 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(4))).value))
+                If objects.ContainsKey(cparameters(4)) Then
+                    atmpval4 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(4))).value))
                 Else
-                    atmpval4 = Convert.ToDecimal(vppstring_to_string(parameters(4)))
+                    atmpval4 = Convert.ToDecimal(vppstring_to_string(cparameters(4)))
                 End If
 
                 'Color
-                If objects.ContainsKey(parameters(5)) Then
-                    atmpval5 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(5))).value))
+                If objects.ContainsKey(cparameters(5)) Then
+                    atmpval5 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(5))).value))
                 Else
-                    atmpval5 = Convert.ToDecimal(vppstring_to_string(parameters(5)))
+                    atmpval5 = Convert.ToDecimal(vppstring_to_string(cparameters(5)))
                 End If
-                If objects.ContainsKey(parameters(6)) Then
-                    atmpval6 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(6))).value))
+                If objects.ContainsKey(cparameters(6)) Then
+                    atmpval6 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(6))).value))
                 Else
-                    atmpval6 = Convert.ToDecimal(vppstring_to_string(parameters(6)))
+                    atmpval6 = Convert.ToDecimal(vppstring_to_string(cparameters(6)))
                 End If
-                If objects.ContainsKey(parameters(7)) Then
-                    atmpval7 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(7))).value))
+                If objects.ContainsKey(cparameters(7)) Then
+                    atmpval7 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(7))).value))
                 Else
-                    atmpval7 = Convert.ToDecimal(vppstring_to_string(parameters(7)))
+                    atmpval7 = Convert.ToDecimal(vppstring_to_string(cparameters(7)))
                 End If
 
-                If objects.ContainsKey(parameters(8)) Then
-                    atmpval8 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(8))).value))
+                If objects.ContainsKey(cparameters(8)) Then
+                    atmpval8 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(8))).value))
                 Else
-                    atmpval8 = Convert.ToDecimal(vppstring_to_string(parameters(8)))
+                    atmpval8 = Convert.ToDecimal(vppstring_to_string(cparameters(8)))
                 End If
 
                 If guiwindow IsNot Nothing Then
                     guiwindow.drawline(atmpval1, atmpval2, atmpval3, atmpval4, Drawing.Color.FromArgb(255, atmpval5, atmpval6, atmpval7), atmpval8)
                 End If
-            ElseIf parameters(0) = "0x0052" Then
+            ElseIf cparameters(0) = "0x0052" Then
                 'Color
-                If objects.ContainsKey(parameters(1)) Then
-                    atmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                If objects.ContainsKey(cparameters(1)) Then
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value))
                 Else
-                    atmpval1 = Convert.ToDecimal(vppstring_to_string(parameters(1)))
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(cparameters(1)))
                 End If
-                If objects.ContainsKey(parameters(2)) Then
-                    atmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(2))).value))
+                If objects.ContainsKey(cparameters(2)) Then
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value))
                 Else
-                    atmpval2 = Convert.ToDecimal(vppstring_to_string(parameters(2)))
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(cparameters(2)))
                 End If
-                If objects.ContainsKey(parameters(3)) Then
-                    atmpval3 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(3))).value))
+                If objects.ContainsKey(cparameters(3)) Then
+                    atmpval3 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(3))).value))
                 Else
-                    atmpval3 = Convert.ToDecimal(vppstring_to_string(parameters(3)))
+                    atmpval3 = Convert.ToDecimal(vppstring_to_string(cparameters(3)))
                 End If
 
                 If guiwindow IsNot Nothing Then
                     guiwindow.clear(Drawing.Color.FromArgb(255, atmpval1, atmpval2, atmpval3))
                 End If
 
-            ElseIf parameters(0) = "0x0053" Then
+            ElseIf cparameters(0) = "0x0053" Then
                 'Coordinates
-                If objects.ContainsKey(parameters(1)) Then
-                    atmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(1))).value))
+                If objects.ContainsKey(cparameters(1)) Then
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(1))).value))
                 Else
-                    atmpval1 = Convert.ToDecimal(vppstring_to_string(parameters(1)))
+                    atmpval1 = Convert.ToDecimal(vppstring_to_string(cparameters(1)))
                 End If
-                If objects.ContainsKey(parameters(2)) Then
-                    atmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(2))).value))
+                If objects.ContainsKey(cparameters(2)) Then
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(2))).value))
                 Else
-                    atmpval2 = Convert.ToDecimal(vppstring_to_string(parameters(2)))
-                End If
-
-                If objects.ContainsKey(parameters(3)) Then
-                    atmpval3 = vppstring_to_string(objects(vppstring_to_string(parameters(3))).value)
-                Else
-                    atmpval3 = vppstring_to_string(parameters(3))
+                    atmpval2 = Convert.ToDecimal(vppstring_to_string(cparameters(2)))
                 End If
 
-                If objects.ContainsKey(parameters(4)) Then
-                    atmpval3 = vppstring_to_string(objects(vppstring_to_string(parameters(4))).value)
+                If objects.ContainsKey(cparameters(3)) Then
+                    atmpval3 = vppstring_to_string(objects(vppstring_to_string(cparameters(3))).value)
                 Else
-                    atmpval3 = vppstring_to_string(parameters(4))
+                    atmpval3 = vppstring_to_string(cparameters(3))
+                End If
+
+                If objects.ContainsKey(cparameters(4)) Then
+                    atmpval3 = vppstring_to_string(objects(vppstring_to_string(cparameters(4))).value)
+                Else
+                    atmpval3 = vppstring_to_string(cparameters(4))
                 End If
 
                 'Color
-                If objects.ContainsKey(parameters(5)) Then
-                    atmpval5 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(5))).value))
+                If objects.ContainsKey(cparameters(5)) Then
+                    atmpval5 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(5))).value))
                 Else
-                    atmpval5 = Convert.ToDecimal(vppstring_to_string(parameters(5)))
+                    atmpval5 = Convert.ToDecimal(vppstring_to_string(cparameters(5)))
                 End If
-                If objects.ContainsKey(parameters(6)) Then
-                    atmpval6 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(6))).value))
+                If objects.ContainsKey(cparameters(6)) Then
+                    atmpval6 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(6))).value))
                 Else
-                    atmpval6 = Convert.ToDecimal(vppstring_to_string(parameters(6)))
+                    atmpval6 = Convert.ToDecimal(vppstring_to_string(cparameters(6)))
                 End If
-                If objects.ContainsKey(parameters(7)) Then
-                    atmpval7 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(7))).value))
+                If objects.ContainsKey(cparameters(7)) Then
+                    atmpval7 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(7))).value))
                 Else
-                    atmpval7 = Convert.ToDecimal(vppstring_to_string(parameters(7)))
+                    atmpval7 = Convert.ToDecimal(vppstring_to_string(cparameters(7)))
                 End If
 
-                If objects.ContainsKey(parameters(8)) Then
-                    atmpval8 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(parameters(8))).value))
+                If objects.ContainsKey(cparameters(8)) Then
+                    atmpval8 = Convert.ToDecimal(vppstring_to_string(objects(vppstring_to_string(cparameters(8))).value))
                 Else
-                    atmpval8 = Convert.ToDecimal(vppstring_to_string(parameters(8)))
+                    atmpval8 = Convert.ToDecimal(vppstring_to_string(cparameters(8)))
                 End If
 
                 If guiwindow IsNot Nothing Then
@@ -1867,7 +1868,8 @@ Public Class VppInterpreter
                 End If
 
             Else
-                exceptionmsg("Invalid parameters given: " + Chr(34) + parameters(0) + Chr(34), "c_0001")
+                MsgBox("-" + cparameters(0) + "-")
+                exceptionmsg("Invalid parameters given: " + Chr(34) + cparameters(0) + Chr(34), "c_0001")
             End If
         Catch ex As Exception
             If TypeOf ex Is NullReferenceException Then
@@ -2137,21 +2139,25 @@ Public Class VppInterpreter
                         vpps_tmpval = vpps_tmpval + i
                     End If
                 End If
-            Else
-                If i = "n" Then
-                    If modify = False Then
-                        vpps_tmpval = vpps_tmpval + "n"
-                    ElseIf modify = True Then
-                        If tmpval = "\\" Then
-                            vpps_tmpval = vpps_tmpval + vbNewLine
-                            tmpval = ""
-                        Else
-                            vpps_tmpval = vpps_tmpval + i
-                        End If
+            ElseIf i = "n" Then
+                If modify = False Then
+                    vpps_tmpval = vpps_tmpval + "n"
+                ElseIf modify = True Then
+                    If tmpval = "\\" Then
+                        vpps_tmpval = vpps_tmpval + vbNewLine
+                        tmpval = ""
+                    Else
+                        vpps_tmpval = vpps_tmpval + i
                     End If
-                Else
-                    vpps_tmpval = vpps_tmpval + i
                 End If
+            Else
+                If tmpval = "\\" Then
+                    strpip += 1
+                    If strpip >= 5 Then
+                        tmpval = ""
+                    End If
+                End If
+                vpps_tmpval = vpps_tmpval + i
             End If
         Next
         tmpval = Nothing
@@ -2174,17 +2180,13 @@ Public Class VppInterpreter
         End If
     End Function
 
-    Function stringa_to_string(_value As String(), Optional startip As Integer = 0) As String
-        Static tmpval_stra
-        tmpval_stra = ""
-        tmpip = 0
-        For Each i In _value
-            If tmpip >= startip Then
-                tmpval_stra += i + " "
-            End If
-            tmpip += 1
+    Function stringa_to_string(ByVal _value As String(), Optional startip As Integer = 0) As String
+        Dim stmp(_value.Length - 1) As String
+        _value.CopyTo(stmp, 0)
+        For i = 0 To startip - 1 Step 1
+            stmp(i) = ""
         Next
-        Return tmpval_stra
+        Return String.Join(" ", stmp).Remove(0, startip)
     End Function
 
     Sub log(logmsg As String)
@@ -2211,7 +2213,7 @@ Public Class VppInterpreter
             End If
             If guiwindow.kdii Then
                 guiwindow.kdii = False
-                invokeevent({"GUI_KeyDown", guiwindow.kdi})
+                invokeevent({"GUI_KeyDown", """" + guiwindow.kdi + """"})
             End If
         End If
         If webserverclass IsNot Nothing Then
