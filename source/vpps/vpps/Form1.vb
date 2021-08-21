@@ -5,7 +5,7 @@ Imports System.Net
 Public Class Form1
     Public logfile As StreamWriter
     Public prerelease = False
-    Public versub = "a"
+    Public versub = "b"
 
     Public egnum = 0
     Public pendingup = False

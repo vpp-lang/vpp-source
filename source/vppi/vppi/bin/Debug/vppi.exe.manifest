@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="vppi.exe" size="376120">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="vppi.exe" size="377144">
       <assemblyIdentity name="vppi" version="1.1.1.9" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>KFpIWqrj3Q9vSmiGB4u6H18AxT3gJ4aTPb9HRx1vRcE=</dsig:DigestValue>
+        <dsig:DigestValue>bcTkue0rzeH4RkS49igKItzzqWrSBuYgtrGDJ/sqgRg=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -938,6 +938,39 @@ Public Class VppInterpreter
                     objects(mathparameters(0)).value = Math.Tan(Convert.ToDecimal(tmpval2)).ToString
                 End If
             End If
+        ElseIf stringvalmath(2) = "atan" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "number" Then
+                    objects(mathparameters(0)).value = Math.Atan(Convert.ToDecimal(tmpval2)).ToString
+                End If
+            End If
+        ElseIf stringvalmath(2) = "atan2" Then
+            If gettypefromval(mathparameters(1)) = "number" Then
+                tmpval2 = mathparameters(1)
+            Else
+                If objects.ContainsKey(mathparameters(1)) Then
+                    tmpval2 = objects(mathparameters(1)).value
+                End If
+            End If
+            If gettypefromval(mathparameters(2)) = "number" Then
+                atmpval3 = mathparameters(2)
+            Else
+                If objects.ContainsKey(mathparameters(2)) Then
+                    atmpval3 = objects(mathparameters(2)).value
+                End If
+            End If
+            If objects.ContainsKey(mathparameters(0)) Then
+                If objects(mathparameters(0)).type = "number" Then
+                    objects(mathparameters(0)).value = Math.Atan2(Convert.ToDecimal(tmpval2), Convert.ToDecimal(atmpval3)).ToString
+                End If
+            End If
         ElseIf stringvalmath(2) = "floor" Then
             If gettypefromval(mathparameters(1)) = "number" Then
                 tmpval2 = mathparameters(1)
