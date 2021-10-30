@@ -135,6 +135,8 @@ Public Class VppInterpreter
     Public callstack As New Stack(Of CallStackObject)
     Public usecallstack As Boolean = False
 
+    Dim neweval As New Evaluator()
+
     'UI Stuff
     Public WithEvents guiwindow As WindowUIManager
 
@@ -224,6 +226,13 @@ Public Class VppInterpreter
             End If
         Next
         Return varnamebadt
+    End Function
+
+    Function intexp(seval As String)
+        For Each i As KeyValuePair(Of String, DefineObject) In objects
+            seval.Replace(" " + i.Key + " ", " " + i.Value.value.ToString + " ")
+        Next
+        Return neweval.Eval(seval).ToString()
     End Function
 
     Function tick(state As Object) As TimerCallback
@@ -675,15 +684,12 @@ Public Class VppInterpreter
     End Function
 
     Sub setexec(insset As String())
+
         If objects.ContainsKey(insset(0)) Then
             If insset(1) = "=" Then
                 'Set variable value
                 If objects.ContainsKey(insset(2)) Then
-                    If isexpression(insset, 2) Then
-
-                    Else
-                        setvalue(insset(0), getvalue(insset(2)))
-                    End If
+                    setvalue(insset(0), getvalue(insset(2)))
                 ElseIf dependencies.ContainsKey(insset(2)) Then
                     If insset(3) = "::" Then
                         If dependencies(insset(2)).objects.ContainsKey(insset(4)) Then
@@ -697,6 +703,8 @@ Public Class VppInterpreter
                         setvalue(insset(0), insset(2))
                     End If
                 End If
+            ElseIf insset(1) = "e=" Then
+                setvalue(insset(0), intexp(stringa_to_string(insset, 2)))
             Else
                 'Execute function
                 Dim funcargs As String() = parsearguments(insset, 1)
@@ -1242,37 +1250,6 @@ Public Class VppInterpreter
             End If
         End Try
     End Sub
-
-    Function isexpression(insset() As String, startip As String)
-        tmpval4 = parsearguments(insset, startip)
-        tmpval1 = False
-        tmpval2 = False
-        For Each i In tmpval4(0)
-            If i = "+" Then
-                If tmpval2 = False Then
-                    tmpval1 = True
-                End If
-            ElseIf i = "-" Then
-                If tmpval2 = False Then
-                    tmpval1 = True
-                End If
-            ElseIf i = "*" Then
-                If tmpval2 = False Then
-                    tmpval1 = True
-                End If
-            ElseIf i = ":" Then
-                If tmpval2 = False Then
-                    tmpval1 = True
-                End If
-            ElseIf i = Chr(34) Then
-                If tmpval2 = False Then
-                    tmpval2 = True
-                Else
-                    tmpval2 = False
-                End If
-            End If
-        Next
-    End Function
 
     Sub instruction_def(ByVal stringval() As String)
         If state = 1 Then

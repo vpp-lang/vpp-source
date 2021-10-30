@@ -4,7 +4,7 @@
   <description asmv2:iconFile="newvpplogo.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="vppsetup" version="1.1.1.9" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="vppsetup" version="1.1.2.0" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
     <commandLine file="vppsetup.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="vppsetup.exe" size="2000696">
-      <assemblyIdentity name="vppsetup" version="1.1.1.9" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="vppsetup.exe" size="2005816">
+      <assemblyIdentity name="vppsetup" version="1.1.2.0" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>xS0kAyWbWaWoTDjIpxkCzprixaNjtAvvtmc0V87zAuA=</dsig:DigestValue>
+        <dsig:DigestValue>e23VJ84jEzYpIBwuSHDcpQkIk14Q6LAIi5JGpnJytiU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

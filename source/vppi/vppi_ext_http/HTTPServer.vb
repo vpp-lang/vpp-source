@@ -17,6 +17,7 @@ Public Class HTTPServer
     Public in_resp_code As Integer = 200
     Public in_resp_type As String = ""
     Public in_didresp As Boolean = False
+    Public in_resptype As Integer = 0
 
     Public Sub New(port As String)
         Try
@@ -34,7 +35,7 @@ Public Class HTTPServer
         TimerStart = Now
         Dim TimeSpent As System.TimeSpan
         Dim c = http.EndGetContext(ar)
-        Dim responsestr = "hey"
+        Dim responsestr = ""
         Dim responsecode = 400
         Dim respbyte As Byte()
         http.BeginGetContext(AddressOf requestWait, Nothing)
@@ -51,11 +52,11 @@ Public Class HTTPServer
 
             While in_didresp = False
                 TimeSpent = Now.Subtract(TimerStart)
-                If TimeSpent.TotalSeconds > 5 Then
+                If TimeSpent.TotalSeconds > 15 Then
                     c.Response.StatusCode = 504
                     c.Response.ContentType = "text/html"
                     c.Response.ContentEncoding = Encoding.UTF8
-                    responsestr = "Script took too long to respond to HTTP request. [vppi_ext_http.HTTPServer]"
+                    responsestr = "Script took too long to respond to HTTP request. [V++ - vppi_ext_http.HTTPServer]"
                     c.Response.OutputStream.Write(System.Text.Encoding.UTF8.GetBytes(responsestr), 0, System.Text.Encoding.UTF8.GetBytes(responsestr).Length)
                     c.Response.Close()
                     Exit Sub
