@@ -1,4 +1,5 @@
-﻿Imports System.Net
+﻿Imports System.IO
+Imports System.Net
 Imports System.Web
 
 Public Class HTTPRequest
@@ -31,21 +32,22 @@ Public Class HTTPRequest
     ''' <param name="uploadstr">String for post request.</param>
     ''' <returns>Response.</returns>
     Function webreq(requrl As String, uploadstr As String, method As String)
-        Dim wc As New WebClient
+        Dim httpWebRequest = CType(WebRequest.Create("Api address Here"), HttpWebRequest)
+        httpWebRequest.ContentType = "application/json"
+        httpWebRequest.Method = "POST"
 
-        tmpval2 = "null"
+        Using streamWriter = New StreamWriter(httpWebRequest.GetRequestStream())
+            streamWriter.Write(uploadstr)
+        End Using
 
-        For Each i As KeyValuePair(Of String, String) In webheaders
-            wc.Headers.Add(i.Key, i.Value)
-        Next
+        Dim httpResponse = CType(httpWebRequest.GetResponse(), HttpWebResponse)
+        Dim responseText As String
 
-        Try
-            tmpval2 = wc.UploadString(requrl, method, uploadstr)
-        Catch ex As WebException
-            tmpval2 = "null"
-        End Try
+        Using streamReader = New StreamReader(httpResponse.GetResponseStream())
+            responseText = streamReader.ReadToEnd()
+        End Using
 
-        Return tmpval2
+        Return responseText
     End Function
 
     ''' <summary>

@@ -4,7 +4,7 @@
   <description asmv2:iconFile="newvpplogo.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="vppi" version="1.1.2.0" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="vppi" version="1.1.2.1" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
     <commandLine file="vppi.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -44,25 +44,25 @@
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="vppi.exe" size="390456">
-      <assemblyIdentity name="vppi" version="1.1.2.0" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
+      <assemblyIdentity name="vppi" version="1.1.2.1" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>CuCVlvME6FAbmqpGVBAtvGMdFh88wV84ClU+q1ipRic=</dsig:DigestValue>
+        <dsig:DigestValue>JO6yJnVBnLsY9fb1skfa6DOsDYSqJyrHL5fDZlLJ4eE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="vppi_ext_http.dll" size="12288">
-      <assemblyIdentity name="vppi_ext_http" version="1.1.1.9" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
+      <assemblyIdentity name="vppi_ext_http" version="1.1.2.1" publicKeyToken="1E3DBDA542C4F4D9" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>nkD3k3G2NXtv+AhRnKFCjJr3D+lv3reA2Tdyre9cqbo=</dsig:DigestValue>
+        <dsig:DigestValue>GAZdsy9N2nRAxSBcjCDdzzPFlAnO8NrZnfP4po6Z8BE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
