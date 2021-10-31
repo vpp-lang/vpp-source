@@ -32,9 +32,9 @@ Public Class HTTPRequest
     ''' <param name="uploadstr">String for post request.</param>
     ''' <returns>Response.</returns>
     Function webreq(requrl As String, uploadstr As String, method As String)
-        Dim httpWebRequest = CType(WebRequest.Create("Api address Here"), HttpWebRequest)
+        Dim httpWebRequest = CType(WebRequest.Create(requrl), HttpWebRequest)
         httpWebRequest.ContentType = "application/json"
-        httpWebRequest.Method = "POST"
+        httpWebRequest.Method = method
 
         Using streamWriter = New StreamWriter(httpWebRequest.GetRequestStream())
             streamWriter.Write(uploadstr)
