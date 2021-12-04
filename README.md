@@ -4,7 +4,7 @@
 </p>
 
 # V++ Interpreter (vppi)
-<a><img src="https://img.shields.io/maintenance/no/2021"></a>
+<a><img src="https://img.shields.io/maintenance/yes/2021"></a>
 <a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/vpp-lang/vppi?label=latest%20stable%20release"></a>
 <a href="https://github.com/VMGP/vppi/releases"><img src="https://img.shields.io/github/v/release/vpp-lang/vppi?include_prereleases&label=latest%20(pre)release"></a>
 <a href="https://en.wikipedia.org/wiki/Visual_Basic_.NET"><img src="https://img.shields.io/badge/language-Visual%20Basic%20.NET-blue"></a>
